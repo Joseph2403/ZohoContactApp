@@ -2,6 +2,8 @@ package com.servlets;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -10,13 +12,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import com.database.UserDao;
+import com.database.ContactDao;
 
-@WebServlet("/AddPhoneServlet")
-public class AddPhoneServlet extends HttpServlet {
+@WebServlet("/ViewContactServlet")
+public class ViewContactServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
-    public AddPhoneServlet() {
+    public ViewContactServlet() {
         super();
     }
 
@@ -27,16 +29,8 @@ public class AddPhoneServlet extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		response.setContentType("text/html");
 		PrintWriter out = response.getWriter();
-        HttpSession session =request.getSession();
-        long userId = (long) session.getAttribute("userId");
-        long phone = Long.parseLong(request.getParameter("addphone"));
-        try {
-            if(UserDao.insertUserPhone(userId, phone)) {
-            	response.sendRedirect("userdashboard.jsp");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+		HttpSession session = request.getSession();
+		response.sendRedirect("contacts.jsp");
 	}
 
 }

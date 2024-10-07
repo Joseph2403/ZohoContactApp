@@ -31,11 +31,8 @@ public class AddEmailServlet extends HttpServlet {
         long userId = (long) session.getAttribute("userId");
         String mailId = request.getParameter("addemail");
         try {
-            if(UserDao.insertUserEmail(userId, mailId)) {
-            	out.println("<html><body>");
-                out.println("<p>Email Linked Successfully</p>");
-            	out.println("<a href='userdashboard.jsp'>Dashboard</a>");
-                out.println("</body></html>");
+            if(UserDao.insertUserEmail(userId, mailId, false)) {
+            	response.sendRedirect("userdashboard.jsp");
             }
         } catch (Exception e) {
             e.printStackTrace();

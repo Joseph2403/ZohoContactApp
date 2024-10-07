@@ -16,14 +16,6 @@ import com.database.UserDao;
 public class SignUpServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
-    public SignUpServlet() {
-        super();
-    }
-
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		response.getWriter().append("Served at: ").append(request.getContextPath());
-	}
-
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		PrintWriter out = response.getWriter();
 		String email = request.getParameter("email");
@@ -40,7 +32,7 @@ public class SignUpServlet extends HttpServlet {
         	}
         	else {
         		long userId = UserDao.insertUser(password, name, dateOfBirth, age, state, city);
-    			if (UserDao.insertUserEmail(userId, email) && UserDao.insertUserPhone(userId, phoneNumber)) {
+    			if (UserDao.insertUserEmail(userId, email, true) && UserDao.insertUserPhone(userId, phoneNumber)) {
     				out.println("Add aiduchu: User No - "+userId);
     			}
         	}

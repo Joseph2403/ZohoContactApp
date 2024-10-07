@@ -2,7 +2,7 @@ package com.database;
 
 import java.sql.*;
 
-public class UserDao {
+public class UserDao { 
     private static String url = "jdbc:mysql://localhost:3306/Jojo";
     private static String user = "root";
     private static String password = "root";
@@ -44,12 +44,13 @@ public class UserDao {
         return rs > 0;
     }
 
-    public static boolean insertUserEmail(long userId, String mailId) throws ClassNotFoundException, SQLException {
+    public static boolean insertUserEmail(long userId, String mailId, boolean isPrime) throws ClassNotFoundException, SQLException {
         Connection conn = connectToDB();
-        String query = "insert into UserEmail values (?, ?);";
+        String query = "insert into UserEmail values (?, ?, ?);";
         PreparedStatement ps = conn.prepareStatement(query);
         ps.setLong(1, userId);
         ps.setString(2, mailId);
+        ps.setBoolean(3, isPrime);
         int rs = ps.executeUpdate();
         return rs > 0;
     }
@@ -77,11 +78,29 @@ public class UserDao {
         return rs;
     }
 
-    public static ResultSet getUserDetails(int userId) throws ClassNotFoundException, SQLException {
+    public static ResultSet getUserDetails(long userId) throws ClassNotFoundException, SQLException {
         Connection conn = connectToDB();
         String query = "select * from User where userId = ?";
         PreparedStatement ps = conn.prepareStatement(query);
-        ps.setInt(1, userId);
+        ps.setLong(1, userId);
+        ResultSet rs = ps.executeQuery();
+        return rs;
+    }
+    
+    public static ResultSet getUserEmailDetails(long userId) throws ClassNotFoundException, SQLException {
+        Connection conn = connectToDB();
+        String query = "select * from UserEmail where userId = ?";
+        PreparedStatement ps = conn.prepareStatement(query);
+        ps.setLong(1, userId);
+        ResultSet rs = ps.executeQuery();
+        return rs;
+    }
+    
+    public static ResultSet getUserPhoneDetails(long userId) throws ClassNotFoundException, SQLException {
+        Connection conn = connectToDB();
+        String query = "select * from UserPhone where userId = ?";
+        PreparedStatement ps = conn.prepareStatement(query);
+        ps.setLong(1, userId);
         ResultSet rs = ps.executeQuery();
         return rs;
     }
@@ -93,5 +112,24 @@ public class UserDao {
         ps.setString(1, mailId);
         ResultSet rs = ps.executeQuery();
     	return rs.next();
+    }
+    
+    public static boolean deleteUserEmail(String mailId) throws ClassNotFoundException, SQLException {
+    	Connection conn = connectToDB();
+    	String query = "delete from UserEmail where userEmail = ? and isPrime = 0;";
+    	PreparedStatement ps = conn.prepareStatement(query);
+        ps.setString(1, mailId);
+        int rs = ps.executeUpdate();
+    	return rs > 0;
+    }
+    
+    public static boolean changePrimaryEmail(String mailId, long userId) throws ClassNotFoundException, SQLException {
+    	Connection conn = connectToDB();
+    	String query ="update UserEmail set isPrime = case when userEmail = ? then 1 else 0 end where userId = ? ;";
+    	PreparedStatement ps = conn.prepareStatement(query);
+        ps.setString(1, mailId);
+        ps.setLong(2, userId);
+        int rs = ps.executeUpdate();
+    	return rs > 0;
     }
 }

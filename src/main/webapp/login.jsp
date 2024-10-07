@@ -1,3 +1,8 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<% 
+response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,7 +11,7 @@
     <title>Login Page</title>
 </head>
 <body>
-    <form action="LoginServlet" method="post">
+    <form action="login" method="post">
         <table>
             <tr>
                 <td><label>Email id:</label></td>
@@ -15,7 +20,7 @@
             </tr>
             <tr>
                 <td><label>Password:</label></td>
-                <td><input type="password" name="password" required></td>
+                <td><input type="password" name="password" placeholder="Enter Password" required></td>
             </tr>
             <tr>
                 <td colspan="2"><input type="submit" value="Login"></td>
