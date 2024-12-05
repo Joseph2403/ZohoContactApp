@@ -23,19 +23,19 @@
             </tr>
             <tr>
                 <td><label>Date of Birth:</label></td>
-                <td><input type="date" name="dateOfBirth" placeholder="Enter your Date of Birth" required></td>
+                <td><input type="date" name="dateOfBirth" placeholder="Enter your Date of Birth"></td>
             </tr>
             <tr>
                 <td><label>Age:</label></td>
-                <td><input type="text" name="age" placeholder="Enter your Age" required></td>
+                <td><input type="text" name="age" placeholder="Enter your Age"></td>
             </tr>
             <tr>
                 <td><label>State:</label></td>
-                <td><input type="text" name="state" placeholder="Enter your State" required></td>
+                <td><input type="text" name="state" placeholder="Enter your State"></td>
             </tr>
             <tr>
                 <td><label>City:</label></td>
-                <td><input type="text" name="city" placeholder="Enter your City" required></td>
+                <td><input type="text" name="city" placeholder="Enter your City"></td>
             </tr>
             <tr>
                 <td><label>Phone Number:</label></td>

@@ -25,8 +25,7 @@ checked
 <%
 }
 %>
-<input type="submit" value="Set Primary Email" >
-<input type="hidden" value="" name="delEmail" id="delEmail">
+<input type="submit" value="Confirm" >
 </form>
 <a href="userdashboard.jsp">Back</a>
 </body>

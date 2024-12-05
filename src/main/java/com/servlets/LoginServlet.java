@@ -10,20 +10,23 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import com.database.UserDao;
+import com.pojo.User;
 
-@WebServlet("/login")
+@WebServlet("/LoginServlet")
 public class LoginServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		response.setCharacterEncoding("UTF-8");
 		PrintWriter out = response.getWriter();
         String email = request.getParameter("email");
         String password = request.getParameter("password");
+        
         try {
-            ResultSet rs = UserDao.loginUser(email, password);
-            if (rs.next()) {
+            User rs = UserDao.loginUser(email, password);
+            if (rs != null) {
                 HttpSession session = request.getSession();
-                session.setAttribute("userId", rs.getLong("userId"));
+                session.setAttribute("userId", rs.getUserId());
                 response.sendRedirect("userdashboard.jsp");
             }
             else {

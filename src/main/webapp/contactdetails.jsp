@@ -1,12 +1,11 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
-<%@ page import="java.sql.*, com.database.ContactDao" %>
+<%@ page import="java.sql.*, com.database.ContactDao, com.pojo.*, java.util.ArrayList" %>
 <% 
-long contactId = (long) session.getAttribute("contactId");
-ResultSet rs = ContactDao.getContactDetails(contactId);
-ResultSet emails = ContactDao.getContactEmail(contactId);
-ResultSet phones = ContactDao.getContactPhone(contactId);
-rs.next();
+long contactId = (long) request.getAttribute("contactId");
+Contact contact = (Contact) ContactDao.getContactPojo(contactId);
+ArrayList<String> emails = contact.getContactEmail();
+ArrayList<Long> phones = contact.getContactPhone();
 %>
 <!DOCTYPE html>
 <html>
@@ -15,31 +14,39 @@ rs.next();
 <title>Contact Details</title>
 </head>
 <body>
+<% 
+if (contact != null) {
+%>
 <h1>Contact Details</h1>
 <h2>General Info</h2>
-Name:<%= rs.getString("name") %><br>
-Age:<%= rs.getInt("age") %><br>
-DOB:<%= rs.getString("dateOfBirth") %><br>
-State:<%= rs.getString("state") %><br>
-City:<%= rs.getString("city") %><br>
+Name:<%= contact.getName() %><br>
+Age:<%= contact.getAge() %><br>
+DOB:<%= contact.getDateOfBirth() %><br>
+State:<%= contact.getState() %><br>
+City:<%= contact.getCity() %><br>
 <br>
 <h2>Emails</h2>
 <%
-while (emails.next()) {
+for (String email: emails) {
 %>
-<p><%= emails.getString("contactEmail") %></p>
+<p><%= email %></p>
 <%
 }
 %>
 <br>
 <h2>Phone Numbers</h2>
 <%
-while (phones.next()) {
+for (long phone: phones) {
 %>
-<p><%= phones.getString("contactPhone") %></p>
+<p><%= phone %></p>
 <%
 }
 %>
 <a href="contacts.jsp">Back</a>
+<%
+} else {
+%>
+<p>Invalid Contact</p>
+<% } %>
 </body>
 </html>

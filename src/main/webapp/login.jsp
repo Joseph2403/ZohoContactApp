@@ -11,7 +11,7 @@ response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
     <title>Login Page</title>
 </head>
 <body>
-    <form action="login" method="post">
+    <form action="LoginServlet" method="post">
         <table>
             <tr>
                 <td><label>Email id:</label></td>

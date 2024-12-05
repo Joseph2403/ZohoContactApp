@@ -3,12 +3,20 @@ package com.servlets;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
+import com.pojo.*;
+
+import de.mkammerer.argon2.Argon2;
+import de.mkammerer.argon2.Argon2Factory;
+
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import com.database.UserDao;
 
@@ -17,30 +25,52 @@ public class SignUpServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		response.setCharacterEncoding("UTF-8");
+		
 		PrintWriter out = response.getWriter();
 		String email = request.getParameter("email");
-        String password = request.getParameter("password");
+        char[] password = request.getParameter("password").toCharArray();
         String name = request.getParameter("name");
         String dateOfBirth = request.getParameter("dateOfBirth");
         int age = Integer.parseInt(request.getParameter("age"));
         String state = request.getParameter("state");
         String city = request.getParameter("city");
         long phoneNumber = Long.parseLong(request.getParameter("phoneNumber"));
+        
+        Argon2 argon2 = Argon2Factory.create();
+        String hashedPassword = argon2.hash(10, 65535, 1, password);
+        
         try {
         	if (UserDao.checkExistingEmail(email)) {
         		out.println("Email ID already Existing");
         	}
         	else {
-        		long userId = UserDao.insertUser(password, name, dateOfBirth, age, state, city);
+        		User user = new User(hashedPassword, name, dateOfBirth, age, state, city);
+        		UserEmail userEmail = new UserEmail(email, true);
+        		ArrayList<UserEmail> emails = new ArrayList<>();
+        		emails.add(userEmail);
+        		long userId = UserDao.insertUser(user);
     			if (UserDao.insertUserEmail(userId, email, true) && UserDao.insertUserPhone(userId, phoneNumber)) {
-    				out.println("Add aiduchu: User No - "+userId);
+    				HttpSession session = request.getSession();
+    				session.setAttribute("userId", userId);
+    				user.setUserId(userId);
+    				user.setUserEmail(emails);
+    				response.sendRedirect("userdashboard.jsp");
+    			}
+    			else {
+    				out.println("<script type=\"text/javascript\">");
+                    out.println("alert('There was some kind of error in tne Email or the Phonenumber that your have entered!!!');");
+                    out.println("window.location.href = 'signup.jsp'");
+                    out.println("</script>");
     			}
         	}
  			
 			
 		} catch (ClassNotFoundException | SQLException e) {
 			// TODO Auto-generated catch block
-			out.println("Code a Check panra");
+			e.printStackTrace(response.getWriter());
+		} finally {
+			 argon2.wipeArray(password);
 		}
 	}
 

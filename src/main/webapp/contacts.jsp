@@ -1,9 +1,9 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
-<%@ page import="java.sql.*, com.database.ContactDao" %>
+<%@ page import="java.sql.*, com.database.ContactDao, java.util.*, com.pojo.*" %>
 <% 
 long userId = (long) session.getAttribute("userId");
-ResultSet rs = ContactDao.getContacts(userId);
+ArrayList<Contact> contacts = ContactDao.getUserContactPojo(userId);
 %>
 <!DOCTYPE html>
 <html>
@@ -11,35 +11,50 @@ ResultSet rs = ContactDao.getContacts(userId);
 <meta charset="UTF-8">
 <title>Contacts</title>
 <script>
-    function getClickedButtonName(button, event) {
+    function submitFormWithContactId(button, action) {
         event.preventDefault();
         
         document.getElementById("contactId").value = button.name;
+        document.getElementById("deleteId").value = '';
+        
+        document.myForm.action = action;
+        document.myForm.submit();
+    }
+    function submitFormWithDeleteId(button, action) {
+        event.preventDefault();
+        
+        document.getElementById("deleteId").value = button.name;
+        document.getElementById("contactId").value = '';
 
+        document.myForm.action = action;
         document.myForm.submit();
     }
 </script>
 </head>
 <body>
-<% if (rs.next()) { %>
+<% if (contacts != null) { %>
 <form name="myForm"action="DisplayContactDetailsServlet" method="post">
 <table>
 <% 
-do {
+for (Contact contact: contacts) {
 %>  
 <tr>
 <td>
-    <input type="submit" name="<%= rs.getLong("contactId") %>" value="<%= rs.getString("name") %>" onclick="getClickedButtonName(this, event)">
+    <input type="submit" name="<%= contact.getContactId() %>" value="<%= contact.getName() %>" onclick="submitFormWithContactId(this, 'DisplayContactDetailsServlet')">
+</td>
+<td>
+	<input type="submit" name="<%= contact.getContactId() %>" value="Delete <%= contact.getName() %>" onclick="submitFormWithDeleteId(this, 'DeleteContactServlet')">
 </td>
 </tr>
 <%
-} while (rs.next());
+}
 %>
 </table>
 <input type="hidden" value="" name="contactId" id="contactId">
+<input type="hidden" value="" name="deleteId" id="deleteId">
 </form>
 <% } else { %>
-<p>There was some error</p>
+<p>No Contacts to Display</p>
 <% } %>
 <a href="userdashboard.jsp">Back</a>
 </body>

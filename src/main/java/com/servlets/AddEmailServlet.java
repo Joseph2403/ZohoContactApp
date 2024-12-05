@@ -16,17 +16,7 @@ import com.database.UserDao;
 public class AddEmailServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
-    public AddEmailServlet() {
-        super();
-    }
-
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		response.getWriter().append("Served at: ").append(request.getContextPath());
-	}
-	
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		response.setContentType("text/html");
-		PrintWriter out = response.getWriter();
         HttpSession session =request.getSession();
         long userId = (long) session.getAttribute("userId");
         String mailId = request.getParameter("addemail");

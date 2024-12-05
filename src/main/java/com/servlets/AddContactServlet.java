@@ -28,16 +28,17 @@ public class AddContactServlet extends HttpServlet {
 		HttpSession session = request.getSession();
 		long userId = (long) session.getAttribute("userId");
 		PrintWriter out = response.getWriter();
-		String email = request.getParameter("contactEmail1");
+		String[] emails = request.getParameterValues("contactEmail");
         String name = request.getParameter("contName");
         String dateOfBirth = request.getParameter("contDateOfBirth");
         int age = Integer.parseInt(request.getParameter("contAge"));
         String state = request.getParameter("contState");
         String city = request.getParameter("contCity");
-        long phoneNumber = Long.parseLong(request.getParameter("contactPhone1"));
+        String[] phoneNumbers = request.getParameterValues("contactPhone");
+        
         try {
         	long contactId = ContactDao.insertContact(userId, name, age, dateOfBirth, state, city);
-			if (ContactDao.insertContactEmail(contactId, email) && ContactDao.insertContactPhone(contactId, phoneNumber)) {
+			if (ContactDao.insertContactEmail(contactId, emails) && ContactDao.insertContactPhone(contactId, phoneNumbers)) {
 				out.println("<p>Contact Add Aiduchu: Contact No - "+contactId+"</p>");
 				out.println("<a href='userdashboard.jsp'>Back</a>");
 			}

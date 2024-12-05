@@ -1,6 +1,8 @@
 package com.database;
 
 import java.sql.*;
+import java.util.ArrayList;
+import com.pojo.*;
 
 public class ContactDao {
     private static String url = "jdbc:mysql://localhost:3306/Jojo";
@@ -12,6 +14,79 @@ public class ContactDao {
         Class.forName(driver);
         Connection conn = DriverManager.getConnection(url, user, password);
         return conn;
+    }
+    
+    public static ArrayList<Contact> getUserContactPojo (long userId) throws ClassNotFoundException, SQLException {
+    	ArrayList<Contact> contacts = new ArrayList<>();
+    	Connection conn = connectToDB();
+        String query = "select c.*, group_concat(distinct ce.contactEmail) as contactEmails, group_concat(distinct cp.contactPhone) as contactPhones from Contact c left join ContactEmail ce on c.contactId = ce.contactId left join ContactPhone cp on c.contactId = cp.contactId where c.userId = ? group by c.contactId;";
+        PreparedStatement ps = conn.prepareStatement(query);
+        ps.setLong(1, userId);
+        ResultSet rs = ps.executeQuery();
+        if(rs.next()) {
+        	do {
+        	Contact contact = new Contact(
+        			rs.getString("name"),
+        			rs.getInt("age"),
+        			rs.getString("dateOfBirth"),
+        			rs.getString("state"),
+        			rs.getString("city")
+        			);
+        	ArrayList<String> contactEmails = new ArrayList<>();
+        	ArrayList<Long> contactPhones = new ArrayList<>();
+        	String[] dbEmails = ((String) rs.getString("contactEmails")).split(",");
+        	String[] dbPhones = ((String) rs.getString("contactPhones")).split(",");
+        	
+        	for (int i=0; i < dbEmails.length; i++) {
+        		contactEmails.add(dbEmails[i]);
+        	}
+        	
+        	
+        	for (int j=0; j < dbPhones.length; j++) {
+        		contactPhones.add(Long.parseLong(dbPhones[j]));
+        	}
+        	contact.setContactId(rs.getLong("contactId"));
+        	contact.setContactEmail(contactEmails);
+        	contact.setContactPhone(contactPhones);
+        	contacts.add(contact);
+        	} while (rs.next());
+        	return contacts;
+        }
+		return null;	
+    }
+    
+    public static Contact getContactPojo(long contactId) throws SQLException, ClassNotFoundException {
+    	Connection conn = connectToDB();
+    	String query = "select c.*, group_concat(distinct ce.contactEmail) as contactEmails, group_concat(distinct cp.contactPhone) as contactPhones from Contact c left join ContactEmail ce on c.contactId = ce.contactId left join ContactPhone cp on c.contactId = cp.contactId where c.contactId = ? group by c.contactId;";
+    	PreparedStatement ps = conn.prepareStatement(query);
+        ps.setLong(1, contactId);
+        ResultSet rs = ps.executeQuery();
+        if(rs.next()) {
+        	Contact contact = new Contact(
+        			rs.getString("name"),
+        			rs.getInt("age"),
+        			rs.getString("dateOfBirth"),
+        			rs.getString("state"),
+        			rs.getString("city")
+        			);
+        	ArrayList<String> contactEmails = new ArrayList<>();
+        	ArrayList<Long> contactPhones = new ArrayList<>();
+        	String[] dbEmails = ((String) rs.getString("contactEmails")).split(",");
+        	String[] dbPhones = ((String) rs.getString("contactPhones")).split(",");
+        	
+        	for (int i=0; i < dbEmails.length; i++) {
+        		contactEmails.add(dbEmails[i]);
+        	}
+        		
+        	for (int j=0; j < dbPhones.length; j++) {
+        		contactPhones.add(Long.parseLong(dbPhones[j]));
+        	}
+        	contact.setContactId(rs.getLong("contactId"));
+        	contact.setContactEmail(contactEmails);
+        	contact.setContactPhone(contactPhones);
+        	return contact;
+        }
+		return null;	
     }
     
     public static long insertContact(long userId, String name, int age, String dateOfBirth, String state, String city) throws ClassNotFoundException, SQLException {
@@ -34,24 +109,38 @@ public class ContactDao {
         return 0;
     }
     
-    public static boolean insertContactPhone(long userId, long phoneNumber) throws ClassNotFoundException, SQLException {
+    public static boolean insertContactPhone(long userId, String[] phoneNumbers) throws ClassNotFoundException, SQLException {
         Connection conn = connectToDB();
         String query = "insert into ContactPhone values (?, ?);";
         PreparedStatement ps = conn.prepareStatement(query);
-        ps.setLong(1, userId);
-        ps.setLong(2, phoneNumber);
-        int rs = ps.executeUpdate();
-        return rs > 0;
+        for (String s: phoneNumbers) {
+        	long phoneNumber = Long.parseLong(s);
+        	ps.setLong(1, userId);
+            ps.setLong(2, phoneNumber);
+            ps.addBatch();
+        }
+        
+        int[] rs = ps.executeBatch();
+    	for(int n: rs) {
+    		if (n < 1) return false;
+    	}
+    	return true;
     }
     
-    public static boolean insertContactEmail(long userId, String mailId) throws ClassNotFoundException, SQLException {
+    public static boolean insertContactEmail(long userId, String[] mailIds) throws ClassNotFoundException, SQLException {
         Connection conn = connectToDB();
         String query = "insert into ContactEmail values (?, ?);";
         PreparedStatement ps = conn.prepareStatement(query);
+        for (String mailId: mailIds) {
         ps.setLong(1, userId);
         ps.setString(2, mailId);
-        int rs = ps.executeUpdate();
-        return rs > 0;
+        ps.addBatch();
+        }
+        int[] rs = ps.executeBatch();
+    	for(int n: rs) {
+    		if (n < 1) return false;
+    	}
+    	return true;
     }
     
     public static ResultSet getContacts(long userId) throws ClassNotFoundException, SQLException {
@@ -88,5 +177,14 @@ public class ContactDao {
         ps.setLong(1, contactId);
         ResultSet rs = ps.executeQuery();
     	return rs;
+    }
+    
+    public static boolean deleteContact(long contactId) throws ClassNotFoundException, SQLException {
+    	Connection conn = connectToDB();
+    	String query = "delete from Contact where contactId = ?;";
+    	PreparedStatement ps = conn.prepareStatement(query);
+        ps.setLong(1, contactId);
+        int rs = ps.executeUpdate();
+    	return rs > 0;
     }
 }

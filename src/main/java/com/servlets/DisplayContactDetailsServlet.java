@@ -5,6 +5,7 @@ import java.io.PrintWriter;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -28,12 +29,12 @@ public class DisplayContactDetailsServlet extends HttpServlet {
 	}
 	
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		response.setContentType("text/html");
-		PrintWriter out = response.getWriter();
 		HttpSession session = request.getSession();
 		long contactId =  Long.parseLong(request.getParameter("contactId"));
-		session.setAttribute("contactId", contactId);
-		response.sendRedirect("contactdetails.jsp");
+		request.setAttribute("contactId", contactId);
+		RequestDispatcher rp = request.getRequestDispatcher("contactdetails.jsp");
+		rp.forward(request, response);
+//		response.sendRedirect("contactdetails.jsp");
 	}
 
 }
