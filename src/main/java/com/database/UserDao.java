@@ -2,6 +2,8 @@ package com.database;
 
 import java.sql.*;
 import com.pojo.*;
+import com.querylayer.JojoDB;
+import com.querylayer.QueryBuilder;
 
 import de.mkammerer.argon2.Argon2;
 import de.mkammerer.argon2.Argon2Factory;
@@ -9,7 +11,7 @@ import org.mindrot.jbcrypt.BCrypt;
 import java.util.ArrayList;
 
 public class UserDao {
-	private static String url = "		jdbc:mysql://localhost:3306/Jojo";
+	private static String url = "jdbc:mysql://localhost:3306/Jojo";
 	private static String user = "root";
 	private static String password = "root";
 	private static String driver = "com.mysql.cj.jdbc.Driver";
@@ -18,7 +20,6 @@ public class UserDao {
 		Class.forName(driver);
 		Connection conn = DriverManager.getConnection(url, user, password);
 		return conn;
-		
 	}
 
 	public static User getUserPojo(long userId) throws ClassNotFoundException, SQLException {
@@ -30,7 +31,7 @@ public class UserDao {
 		if (rs.next()) {
 			UserEmail userEmail;
 			User user = new User(rs.getString("password"), rs.getString("name"), rs.getString("dateOfBirth"),
-					rs.getInt("age"), rs.getString("state"), rs.getString("city"));
+					rs.getInt("age"), rs.getString("state"), rs.getString("city"), rs.getInt("passCheck"));
 			ArrayList<UserEmail> userEmails = new ArrayList<>();
 			ArrayList<Long> userPhones = new ArrayList<>();
 			System.out.println("PrimaryCheck " + rs.getString("isPrime"));
@@ -57,7 +58,7 @@ public class UserDao {
 
 	public static long insertUser(User user) throws ClassNotFoundException, SQLException {
 		Connection conn = connectToDB();
-		String query = "insert into User(password, name, dateOfBirth, age, state, city) values (?, ?, ?, ?, ?, ?);";
+		String query = "insert into User(password, name, dateOfBirth, age, state, city, passCheck) values (?, ?, ?, ?, ?, ?, ?);";
 		PreparedStatement ps = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
 		ps.setString(1, user.getPassword());
 		ps.setString(2, user.getName());
@@ -65,6 +66,7 @@ public class UserDao {
 		ps.setInt(4, user.getAge());
 		ps.setString(5, user.getState());
 		ps.setString(6, user.getCity());
+		ps.setInt(7, user.getPassCheck());
 		long rs = ps.executeUpdate();
 		if (rs > 0) {
 			ResultSet generatedKeys = ps.getGeneratedKeys();
@@ -158,21 +160,25 @@ public class UserDao {
 	}
 
 	public static User loginUser(String mailId, String password) throws ClassNotFoundException, SQLException {
-		int algoNum = 2;
+		int algoNum = 1;
 		Connection conn = connectToDB();
 		String query = "select * from User u join UserEmail ue on u.userId = ue.userId where userEmail = ?;";
+//		String query = QueryBuilder.select(JojoDB.UserTab.ALL, JojoDB.UserEmailTab.ALL).from(JojoDB.Table.USER)
+//				.join(JojoDB.JoinType.INNER_JOIN, JojoDB.Table.USEREMAIL, JojoDB.UserTab.USERID,
+//						JojoDB.UserEmailTab.USERID)
+//				.where(JojoDB.UserEmailTab.USERID, JojoDB.Comparisons.EQUALS, "?").build();
 		PreparedStatement ps = conn.prepareStatement(query);
 		ps.setString(1, mailId);
 		ResultSet rs = ps.executeQuery();
 		if (rs.next()) {
 			int passCheck = rs.getInt("passCheck");
-			
-			boolean isValidPassword =  checkPassword(password, rs.getString("password"), passCheck);
-			
+
+			boolean isValidPassword = checkPassword(password, rs.getString("password"), passCheck);
+
 			if (isValidPassword && passCheck != algoNum) {
 				isValidPassword = hashPassword(password, algoNum, conn, rs.getLong("userId")) > 0;
 			}
-			
+
 			if (isValidPassword) {
 				User user = getUserPojo(rs.getLong("userId"));
 				return user;
@@ -183,14 +189,14 @@ public class UserDao {
 		return null;
 	}
 
-	public static ResultSet getUserDetails(long userId) throws ClassNotFoundException, SQLException {
-		Connection conn = connectToDB();
-		String query = "select * from User where userId = ?";
-		PreparedStatement ps = conn.prepareStatement(query);
-		ps.setLong(1, userId);
-		ResultSet rs = ps.executeQuery();
-		return rs;
-	}
+//	public static ResultSet getUserDetails(long userId) throws ClassNotFoundException, SQLException {
+//		Connection conn = connectToDB();
+//		String query = "select * from User where userId = ?";
+//		PreparedStatement ps = conn.prepareStatement(query);
+//		ps.setLong(1, userId);
+//		ResultSet rs = ps.executeQuery();
+//		return rs;
+//	}
 
 	public static ResultSet getUserEmailDetails(long userId) throws ClassNotFoundException, SQLException {
 		Connection conn = connectToDB();
@@ -276,7 +282,4 @@ public class UserDao {
 		return rs > 0;
 	}
 
-	public static boolean hashPassword(String password) {
-		return false;
-	}
 }

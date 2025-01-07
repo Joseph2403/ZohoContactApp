@@ -2,7 +2,6 @@ package com.servlets;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.ResultSet;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -36,7 +35,8 @@ public class LoginServlet extends HttpServlet {
                 out.println("</script>");
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            e.printStackTrace(response.getWriter());
+            
         }
 	}
 

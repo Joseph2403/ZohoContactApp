@@ -2,25 +2,50 @@ package com.querylayer;
 
 import java.util.*;
 
-public class QueryBuilder {
+import com.pojo.Category;
+import com.pojo.Contact;
+import com.pojo.User;
 
-	public static InsertBuilder insert(JojoDB.Table table) {
+public class QueryBuilder2 {
+	ArrayList<String> tables = new ArrayList<>();
+	public String finalQuery;
+	String mainTable;
+	String Command;
+
+	public Class<?> getMainClass() {
+		if (mainTable.equals("User")) {
+			return User.class;
+		}
+		else if (mainTable.equals("Contact")) {
+			return Contact.class;
+		}
+		else if (mainTable.equals("Category")) {
+			return Category.class;
+		}
+		return null;
+	}
+
+	public InsertBuilder insert(JojoDB.Table table) {
+		this.Command = "insert";
 		return new InsertBuilder(table);
 	}
 
-	public static DeleteBuilder delete(JojoDB.Table table) {
+	public DeleteBuilder delete(JojoDB.Table table) {
+		this.Command = "delete";
 		return new DeleteBuilder(table);
 	}
 
-	public static UpdateBuilder update(JojoDB.Table table) {
+	public UpdateBuilder update(JojoDB.Table table) {
+		this.Command = "update";
 		return new UpdateBuilder(table);
 	}
 
-	public static SelectBuilder select(EnumColumn... columns) {
+	public SelectBuilder select(EnumColumn... columns) {
+		this.Command = "select";
 		return new SelectBuilder(columns);
 	}
 
-	public static class InsertBuilder {
+	public class InsertBuilder {
 		private StringBuilder query = new StringBuilder();
 
 		public InsertBuilder(JojoDB.Table table) {
@@ -46,7 +71,7 @@ public class QueryBuilder {
 		}
 	}
 
-	public static class DeleteBuilder {
+	public class DeleteBuilder {
 		private StringBuilder query = new StringBuilder();
 
 		public DeleteBuilder(JojoDB.Table table) {
@@ -64,7 +89,7 @@ public class QueryBuilder {
 		}
 	}
 
-	public static class UpdateBuilder {
+	public class UpdateBuilder {
 		private StringBuilder query = new StringBuilder();
 		private ArrayList<String> columns = new ArrayList<>();
 		private ArrayList<String> values = new ArrayList<>();
@@ -112,7 +137,7 @@ public class QueryBuilder {
 
 	}
 
-	public static class SelectBuilder {
+	public class SelectBuilder {
 		private StringBuilder query = new StringBuilder();
 		private ArrayList<EnumColumn> columns = new ArrayList<>();
 		private String table;
@@ -128,6 +153,7 @@ public class QueryBuilder {
 
 		public SelectBuilder from(JojoDB.Table table) {
 			this.table = table.getTableName();
+			mainTable = table.getTableName();
 			return this;
 		}
 
@@ -176,7 +202,7 @@ public class QueryBuilder {
 				i++;
 			}
 			this.query.append(" FROM " + this.table);
-
+			tables.add(this.table);
 			// if (!this.table.tableAlias.isEmpty()) {
 			// this.query.append(" "+ this.table.tableAlias);
 			// }
@@ -189,6 +215,7 @@ public class QueryBuilder {
 				for (Join join : this.joins) {
 					this.query.append(
 							" " + join.joinType + " " + join.table + " ON " + join.column1 + " = " + join.column2);
+					tables.add(join.table);
 				}
 			}
 
@@ -216,6 +243,7 @@ public class QueryBuilder {
 				}
 			}
 			this.query.append(";");
+			finalQuery = this.query.toString();
 			return this.query.toString();
 		}
 
@@ -248,13 +276,21 @@ public class QueryBuilder {
 //                .from(JojoDB.Table.USER)
 //                .join(JojoDB.JoinType.LEFT_JOIN, JojoDB.Table.USEREMAIL, JojoDB.UserTab.USERID, JojoDB.UserEmailTab.USERID)
 //                .groupBy(JojoDB.UserTab.USERID, JojoDB.UserTab.NAME).build();
-		String demo2 = QueryBuilder.select(JojoDB.UserTab.AGE, JojoDB.UserEmailTab.ALL, JojoDB.CategoryTab.ALL)
-				.join(JojoDB.JoinType.INNER_JOIN, JojoDB.Table.USEREMAIL, JojoDB.UserTab.USERID,
+		QueryBuilder2 qb = new QueryBuilder2();
+		qb.select(JojoDB.UserTab.ALL, JojoDB.UserEmailTab.USEREMAIL, JojoDB.UserPhoneTab.USERPHONE)
+				.from(JojoDB.Table.USER)
+				.join(JojoDB.JoinType.LEFT_JOIN, JojoDB.Table.USEREMAIL, JojoDB.UserTab.USERID,
 						JojoDB.UserEmailTab.USERID)
-				.from(JojoDB.Table.USER).where(JojoDB.UserTab.USERID, JojoDB.Comparisons.EQUALS, "1")
-				.join(JojoDB.JoinType.INNER_JOIN, JojoDB.Table.CATEGORY, JojoDB.UserTab.USERID,
-						JojoDB.CategoryTab.USERID)
-				.build();
+				.join(JojoDB.JoinType.LEFT_JOIN, JojoDB.Table.USERPHONE, JojoDB.UserTab.USERID,
+						JojoDB.UserPhoneTab.USERID)
+				.where(JojoDB.UserTab.USERID, JojoDB.Comparisons.EQUALS, "7").build();
+		
+		
+		QueryBuilder2 qb2 = new QueryBuilder2();
+		qb2.select(JojoDB.UserTab.ALL, JojoDB.UserEmailTab.ALL).from(JojoDB.Table.USER).join(JojoDB.JoinType.INNER_JOIN, JojoDB.Table.USEREMAIL,
+				JojoDB.UserTab.USERID, JojoDB.UserEmailTab.USERID).build();
+		
+		System.out.println(qb2.finalQuery);
 //    	String demo = QueryBuilder.select(JojoDB.UserEmailTab.ALL, JojoDB.UserTab.ALL).from(JojoDB.Table.USEREMAIL).where(JojoDB.UserEmailTab.USEREMAIL, JojoDB.Comparisons.EQUALS, "taufeeq@gmail.com").join(JojoDB.JoinType.INNER_JOIN, JojoDB.Table.USER, JojoDB.UserTab.USERID, JojoDB.UserEmailTab.USERID).build();
 //        String insertQuery = QueryBuilder.insert(JojoDB.Table.USER)
 //                .columns(JojoDB.UserTab.NAME, JojoDB.UserTab.AGE, JojoDB.UserTab.DATEOFBIRTH)
@@ -285,8 +321,10 @@ public class QueryBuilder {
 		 * ue.userId LEFT JOIN UserPhone up ON u.userId = up.userId WHERE u.userId = ?
 		 * GROUP BY u.userId, u.name;
 		 */
-
-		System.out.println("\nSELECT QUERY: " + demo2);
+//		System.out.println("\nSELECT QUERY: " + qb.finalQuery);
+//		for (String table : qb.tables) {
+//			System.out.print(table + ", ");
+//		}
 //        System.out.println("\nINSERT QUERY: "+insertQuery);
 //        System.out.println("\nUPDATE QUERY: "+updateQuery);
 //        System.out.println("\nDELETE QUERY: "+deleteQuery+"\n");

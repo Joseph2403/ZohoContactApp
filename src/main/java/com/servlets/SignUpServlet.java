@@ -45,7 +45,7 @@ public class SignUpServlet extends HttpServlet {
         		out.println("Email ID already Existing");
         	}
         	else {
-        		User user = new User(hashedPassword, name, dateOfBirth, age, state, city);
+        		User user = new User(hashedPassword, name, dateOfBirth, age, state, city, 1);
         		UserEmail userEmail = new UserEmail(email, true);
         		ArrayList<UserEmail> emails = new ArrayList<>();
         		emails.add(userEmail);

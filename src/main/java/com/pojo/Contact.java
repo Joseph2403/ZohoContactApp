@@ -12,8 +12,10 @@ public class Contact {
 	public String city;
 	ArrayList<String> contactEmail = new ArrayList<>();
 	ArrayList<Long> contactPhone = new ArrayList<>();
-	
-	public Contact(String name, int age, String dateOfBirth, String state, String city) {
+	public Contact () {
+		
+	}
+ 	public Contact(String name, int age, String dateOfBirth, String state, String city) {
 		this.name  = name;
 		this.age = age;
 		this.dateOfBirth = dateOfBirth;

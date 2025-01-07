@@ -7,6 +7,9 @@ public class Category {
 	public String categoryName;
 	public ArrayList<Contact> categoryContacts = new ArrayList<>();
 	
+	public Category () {
+		
+	}
 	public Category (String name) {
 		this.categoryName = name;
 	}
