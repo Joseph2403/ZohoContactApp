@@ -4,9 +4,13 @@ import java.lang.reflect.*;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import com.pojo.*;
+import com.querylayer.DemoExecutor;
 import com.querylayer.Executor;
 import com.querylayer.Executor.SelectExecutor;
 import com.querylayer.JojoDB;
@@ -64,27 +68,36 @@ public class JavaTest {
 //		User out = (User) pojo;
 //		System.out.println(out.city);
 //		System.out.println(metaData.getTableName(1));
-		
+
 		// ----------DB Operations 2----------
 		Connection conn = connectToDB();
 		QueryBuilder2 qb = new QueryBuilder2();
-		qb.select(JojoDB.UserTab.ALL, JojoDB.UserEmailTab.ALL).from(JojoDB.Table.USER)
+		qb.select(JojoDB.UserTab.ALL, JojoDB.UserEmailTab.ALL, JojoDB.UserPhoneTab.ALL).from(JojoDB.Table.USER)
 				.join(JojoDB.JoinType.INNER_JOIN, JojoDB.Table.USEREMAIL, JojoDB.UserTab.USERID,
-						JojoDB.UserEmailTab.USERID).build();
-		Statement stmt = conn.createStatement(
-				ResultSet.TYPE_SCROLL_INSENSITIVE,
-			    ResultSet.CONCUR_READ_ONLY
-			    );
+						JojoDB.UserEmailTab.USERID)
+				.join(JojoDB.JoinType.INNER_JOIN, JojoDB.Table.USERPHONE, JojoDB.UserTab.USERID,
+						JojoDB.UserPhoneTab.USERID).build();
+
+//		System.out.println(qb.finalQuery);
+		Statement stmt = conn.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
 		ResultSet rs = stmt.executeQuery(qb.finalQuery);
 		ResultSetMetaData metaData = rs.getMetaData();
-		
-		int row = rs.getRow();
-		while (rs.next()) {
-			rs.next();
-			System.out.println(row);
+//		
+		DemoExecutor de = new DemoExecutor();
+		List<User> pojos = de.umarPopulator(User.class, null, "siudhfsd");
+		for (User pojo : pojos) {
+			ArrayList<UserEmail> emails = pojo.getUserEmail();
+			System.out.println(pojo.name+"\nEmail Count: "+pojo.getUserEmail().size()+"\nPhone Count: "+pojo.getUserPhone().size()+"\n");
 		}
-		
-//		List<User> pojos = (ArrayList<User>) Executor.executeSelect(rs, qb.getMainClass()).manishaGen(rs, qb.getMainClass(), null);
+//		System.out.println(pojos.size());
+
+//		int row = rs.getRow();
+//		while (rs.next()) {
+//			rs.next();
+//			System.out.println(row);
+//		}
+
+//		List<User> pojos = (ArrayList<User>) Executor.executeSelect(rs, qb.getMainClass()).demoExecute(rs,qb , qb.getMainClass());
 //		for (User pojo: pojos) {
 //			ArrayList<UserEmail> emails = pojo.getUserEmail();
 //			System.out.println(pojo.getName()+"'s POJO:");
@@ -94,7 +107,7 @@ public class JavaTest {
 //			System.out.println();
 //		}
 //		System.out.println(pojos.size());
-		
+
 //		List<String> chumma = new List<>();
 //		rs.next();
 //		rs.previous();
@@ -103,6 +116,15 @@ public class JavaTest {
 //		rs.previous();
 //		rs.next();
 //		System.out.println(rs.getString("name"));
+
+		// ---------- Set Operations---------
+//		Set<String> demoSet = new LinkedHashSet<>();
+//		String[] demoArray = {"apple", "apple", "mango", "kiwi", "mango"};
+//		for (String fruit: demoArray) {
+//			demoSet.add(fruit);
+//		}
+//		String[] array =  demoSet.toArray(new String[0]);
+//		System.out.println(array[array.length-1]);
 	}
 
 }

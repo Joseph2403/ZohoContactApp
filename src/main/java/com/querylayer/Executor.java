@@ -63,135 +63,169 @@ public class Executor {
 //			return null;
 //		}
 
-		public <T> List<T> manishaGen(ResultSet rs, Class<T> clazz, Object check) 
-		        throws InstantiationException, IllegalAccessException, IllegalArgumentException, 
-		               InvocationTargetException, NoSuchMethodException, SecurityException, 
-		               ClassNotFoundException, SQLException {
-		    
-		    List<T> resultList = new ArrayList<>();
-		    int fieldCount = clazz.getDeclaredFields().length;
+//		public <T> List<T> manishaGen(ResultSet rs, Class<T> clazz, Object check) 
+//		        throws InstantiationException, IllegalAccessException, IllegalArgumentException, 
+//		               InvocationTargetException, NoSuchMethodException, SecurityException, 
+//		               ClassNotFoundException, SQLException {
+//		    
+//		    List<T> resultList = new ArrayList<>();
+//		    int fieldCount = clazz.getDeclaredFields().length;
+//
+//		    if (check == null) {
+//		        // Outer loop to process main rows
+//		        while (rs.next()) {
+//		            T pojo = clazz.getDeclaredConstructor().newInstance();
+//		            System.out.println(clazz + " Checked: Row = " + rs.getRow());
+//
+//		            // Populate fields
+//		            for (Field field : clazz.getDeclaredFields()) {
+//		                field.setAccessible(true);
+//		                try {
+//		                    if (field.getType().equals(ArrayList.class)) {
+//		                        ParameterizedType listType = (ParameterizedType) field.getGenericType();
+//		                        Type type = listType.getActualTypeArguments()[0];
+//		                        Class<?> arrayType = Class.forName(type.getTypeName());
+//
+//		                        // Handle nested objects
+//		                        int currentRow = rs.getRow(); // Save current cursor position
+//		                        Object checker = rs.getObject(1);
+//		                        field.set(pojo, manishaGen(rs, arrayType, checker));
+//		                        while (rs.getObject(1).equals(checker)) {
+//		                        	rs.next();
+//		                        }
+//		                        rs.absolute(currentRow); // Restore cursor position
+//		                    } else {
+//		                        field.set(pojo, rs.getObject(field.getName()));
+//		                    }
+//		                } catch (Exception e) {
+//		                    field.set(pojo, null); // Handle missing fields gracefully
+//		                }
+//		            }
+//
+//		            resultList.add(pojo); // Add populated object to the list
+//		        }
+//		    } else {
+//		        // Nested loop for recursive processing
+//		        int currentRow = rs.getRow(); // Save starting position
+//		        do {
+//		        	if (!rs.getObject(1).equals(check)) {
+//		        		break;
+//		        	}
+//		            T pojo = clazz.getDeclaredConstructor().newInstance();
+//		            System.out.println(clazz + " Inner Checked: Row = " + rs.getRow());
+//
+//		            for (Field field : clazz.getDeclaredFields()) {
+//		                field.setAccessible(true);
+//		                try {
+//		                    if (field.getType().equals(ArrayList.class)) {
+//		                        ParameterizedType listType = (ParameterizedType) field.getGenericType();
+//		                        Type type = listType.getActualTypeArguments()[0];
+//		                        Class<?> arrayType = Class.forName(type.getTypeName());
+//		                        
+//		                        // Handle nested objects recursively
+//		                        field.set(pojo, manishaGen(rs, arrayType, rs.getObject(1)));
+//		                    } else {
+//		                        field.set(pojo, rs.getObject(field.getName()));
+//		                    }
+//		                } catch (Exception e) {
+//		                    field.set(pojo, null);
+//		                }
+//		            }
+//		            resultList.add(pojo); // Add populated object to the list
+//		        } while (rs.next() && rs.getRow() != currentRow); // Stop if the cursor loops back
+//		    }
+//
+//		    return resultList;
+//		}
 
-		    if (check == null) {
-		        // Outer loop to process main rows
-		        while (rs.next()) {
-		            T pojo = clazz.getDeclaredConstructor().newInstance();
-		            System.out.println(clazz + " Checked: Row = " + rs.getRow());
+//		public <T> List<T> generatePojo(ResultSet rs, Class<T> clazz, Long userId) throws InstantiationException,
+//				IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException,
+//				SecurityException, ClassNotFoundException, SQLException {
+//			int count = 0;
+//			List<T> result = new ArrayList<>();
+//			while (rs.next()) {
+//				T pojo = clazz.getDeclaredConstructor().newInstance();
+//				System.out.println(clazz + " Checking");
+//				for (Field field : clazz.getDeclaredFields()) {
+//					field.setAccessible(true);
+//
+//					if (userId == null) {
+//						if (field.getType().equals(ArrayList.class)) {
+//							ParameterizedType listType = (ParameterizedType) field.getGenericType();
+//							Type type = listType.getActualTypeArguments()[0];
+//							Class<?> typeClass = Class.forName(type.getTypeName());
+//							rs.beforeFirst();
+//							field.set(pojo, generatePojo(rs, typeClass, null));
+//						} else {
+//							try {
+//								field.set(pojo, rs.getObject(field.getName()));
+//							} catch (SQLException e) {
+//								field.set(pojo, null);
+//							}
+//						}
+//					} else {
+//
+//					}
+//
+//				}
+//				result.add(pojo);
+//			}
+//			return result;
+//		}
 
-		            // Populate fields
-		            for (Field field : clazz.getDeclaredFields()) {
-		                field.setAccessible(true);
-		                try {
-		                    if (field.getType().equals(ArrayList.class)) {
-		                        ParameterizedType listType = (ParameterizedType) field.getGenericType();
-		                        Type type = listType.getActualTypeArguments()[0];
-		                        Class<?> arrayType = Class.forName(type.getTypeName());
-
-		                        // Handle nested objects
-		                        int currentRow = rs.getRow(); // Save current cursor position
-		                        Object checker = rs.getObject(1);
-		                        field.set(pojo, manishaGen(rs, arrayType, checker));
-		                        while (rs.getObject(1).equals(checker)) {
-		                        	rs.next();
-		                        }
-		                        rs.absolute(currentRow); // Restore cursor position
-		                    } else {
-		                        field.set(pojo, rs.getObject(field.getName()));
-		                    }
-		                } catch (Exception e) {
-		                    field.set(pojo, null); // Handle missing fields gracefully
-		                }
-		            }
-
-		            resultList.add(pojo); // Add populated object to the list
-		        }
-		    } else {
-		        // Nested loop for recursive processing
-		        int currentRow = rs.getRow(); // Save starting position
-		        do {
-		        	if (!rs.getObject(1).equals(check)) {
-		        		break;
-		        	}
-		            T pojo = clazz.getDeclaredConstructor().newInstance();
-		            System.out.println(clazz + " Inner Checked: Row = " + rs.getRow());
-
-		            for (Field field : clazz.getDeclaredFields()) {
-		                field.setAccessible(true);
-		                try {
-		                    if (field.getType().equals(ArrayList.class)) {
-		                        ParameterizedType listType = (ParameterizedType) field.getGenericType();
-		                        Type type = listType.getActualTypeArguments()[0];
-		                        Class<?> arrayType = Class.forName(type.getTypeName());
-		                        
-		                        // Handle nested objects recursively
-		                        field.set(pojo, manishaGen(rs, arrayType, rs.getObject(1)));
-		                    } else {
-		                        field.set(pojo, rs.getObject(field.getName()));
-		                    }
-		                } catch (Exception e) {
-		                    field.set(pojo, null);
-		                }
-		            }
-		            resultList.add(pojo); // Add populated object to the list
-		        } while (rs.next() && rs.getRow() != currentRow); // Stop if the cursor loops back
-		    }
-
-		    return resultList;
-		}
+//		public <T> List<T> demoExecute(ResultSet rs, QueryBuilder2 qb, Class<T> clazz) throws SQLException {
+//		    List<T> resultList = new ArrayList<>();
+//		    ResultSetMetaData metaData = rs.getMetaData();
+//		    int colCount = metaData.getColumnCount();
+//		    String key;
+//		    String mainTable = qb.mainTable;
+//		    
+//		    while (rs.next()) {
+//		        key = "";
+//		        for (int i = 1; i <= colCount; i++) {
+//		            if (metaData.getTableName(i).equals(mainTable)) {
+//		                // Safely convert the value to a String
+//		                key += String.valueOf(rs.getObject(i)); // Or rs.getString(i)
+//		            }
+//		        }
+//		        System.out.println(key+"\n");
+//		    }
+//		    return resultList;
+//		}
 
 
-
-		public <T> List<T> generatePojo(ResultSet rs, Class<T> clazz, Long userId) throws InstantiationException,
-				IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException,
-				SecurityException, ClassNotFoundException, SQLException {
-			int count = 0;
-			List<T> result = new ArrayList<>();
+		public <T> List<T> execute(ResultSet rs, QueryBuilder2 qb, Class<T> clazz)
+				throws SQLException, InstantiationException, IllegalAccessException, IllegalArgumentException,
+				InvocationTargetException, NoSuchMethodException, SecurityException, ClassNotFoundException {
+			List<T> resultList = new ArrayList<>();
+			HashMap<String, T> pojos = new HashMap<>();
+			ResultSetMetaData metaData = rs.getMetaData();
+			String mainTable = qb.mainTable;
+			int colCount = (int) Math.ceil(metaData.getColumnCount() / 5);
+			String key;
 			while (rs.next()) {
-				T pojo = clazz.getDeclaredConstructor().newInstance();
-				System.out.println(clazz + " Checking");
-				for (Field field : clazz.getDeclaredFields()) {
-					field.setAccessible(true);
-
-					if (userId == null) {
-						if (field.getType().equals(ArrayList.class)) {
-							ParameterizedType listType = (ParameterizedType) field.getGenericType();
-							Type type = listType.getActualTypeArguments()[0];
-							Class<?> typeClass = Class.forName(type.getTypeName());
-							rs.beforeFirst();
-							field.set(pojo, generatePojo(rs, typeClass, null));
-						} else {
-							try {
-								field.set(pojo, rs.getObject(field.getName()));
-							} catch (SQLException e) {
-								field.set(pojo, null);
-							}
-						}
-					} else {
-
+				T pojo;
+				key = "";
+				for (int i = 1; i <= colCount; i++) {
+					if (metaData.getTableName(i).equals(mainTable)) {
+						key += String.valueOf(rs.getObject(i));
 					}
-
 				}
-				result.add(pojo);
-			}
-			return result;
-		}
-
-		public <T> List<T> execute() throws ClassNotFoundException, SQLException, InstantiationException,
-				IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException,
-				SecurityException, NoSuchFieldException {
-//			return (List<T>) generatePojo(this.rs, this.clazz);
-
-			while (this.rs.next()) {
-				T pojo = (T) clazz.getDeclaredConstructor().newInstance();
-
+				pojo = pojos.get(key);
+				if (pojo == null) {
+					pojo = clazz.getDeclaredConstructor().newInstance();
+					pojos.put(key, pojo);
+				}
+				
 				for (Field field : clazz.getDeclaredFields()) {
 					field.setAccessible(true);
 
 					if (field.getType().equals(ArrayList.class)) {
 						ParameterizedType listType = (ParameterizedType) field.getGenericType();
 						Type type = listType.getActualTypeArguments()[0];
-						Class<?> typeClass = Class.forName(type.getTypeName());
-						Object pojo2 = typeClass.getDeclaredConstructor().newInstance();
-						ArrayList<Object> list = new ArrayList<>();
+						Class<T> typeClass = (Class<T>) Class.forName(type.getTypeName());
+						T pojo2 =  typeClass.getDeclaredConstructor().newInstance();
+						ArrayList<T> pojoList = (ArrayList<T>) field.get(pojo);
 						for (Field field2 : typeClass.getDeclaredFields()) {
 							field2.setAccessible(true);
 							try {
@@ -200,9 +234,11 @@ public class Executor {
 								field2.set(pojo2, null);
 							}
 						}
-						list.add(pojo2);
+						if (!pojoList.contains(pojo2)) {
+							pojoList.add(pojo2);
+						}
 
-						field.set(pojo, list);
+						field.set(pojo, pojoList);
 
 					}
 
@@ -214,36 +250,82 @@ public class Executor {
 						}
 					}
 				}
-
-//				for (int i = 1; i <= metaData.getColumnCount(); i++) {
-//					Field field = clazz.getDeclaredField(metaData.getColumnName(i));
+			}
+			for (T value: pojos.values()) {
+				resultList.add(value);
+			}
+			return resultList;
+		}
+		
+//		public <T> List<T> execute() throws ClassNotFoundException, SQLException, InstantiationException,
+//				IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException,
+//				SecurityException, NoSuchFieldException {
+////			return (List<T>) generatePojo(this.rs, this.clazz);
+//
+//			while (this.rs.next()) {
+//				T pojo = (T) clazz.getDeclaredConstructor().newInstance();
+//
+//				for (Field field : clazz.getDeclaredFields()) {
 //					field.setAccessible(true);
 //
 //					if (field.getType().equals(ArrayList.class)) {
 //						ParameterizedType listType = (ParameterizedType) field.getGenericType();
 //						Type type = listType.getActualTypeArguments()[0];
 //						Class<?> typeClass = Class.forName(type.getTypeName());
-//						Object newObj2 = typeClass.getDeclaredConstructor().newInstance();
+//						Object pojo2 = typeClass.getDeclaredConstructor().newInstance();
 //						ArrayList<Object> list = new ArrayList<>();
+//						for (Field field2 : typeClass.getDeclaredFields()) {
+//							field2.setAccessible(true);
+//							try {
+//								field2.set(pojo2, rs.getObject(field2.getName()));
+//							} catch (SQLException e) {
+//								field2.set(pojo2, null);
+//							}
+//						}
+//						list.add(pojo2);
 //
-//					} else {
-//						field.set(newObj, rs.getObject(metaData.getColumnName(i)));
+//						field.set(pojo, list);
+//
+//					}
+//
+//					else {
+//						try {
+//							field.set(pojo, rs.getObject(field.getName()));
+//						} catch (SQLException e) {
+//							field.set(pojo, null);
+//						}
 //					}
 //				}
-				result.add(pojo);
-			}
-
-//		while (rs.next()) {
-//			rows = new HashMap<>();
-//			for (int i = 1; i <= metaData.getColumnCount(); i++) {
-//				rows.put(metaData.getTableName(i) +"."+ metaData.getColumnLabel(i), rs.getObject(i));
+//
+////				for (int i = 1; i <= metaData.getColumnCount(); i++) {
+////					Field field = clazz.getDeclaredField(metaData.getColumnName(i));
+////					field.setAccessible(true);
+////
+////					if (field.getType().equals(ArrayList.class)) {
+////						ParameterizedType listType = (ParameterizedType) field.getGenericType();
+////						Type type = listType.getActualTypeArguments()[0];
+////						Class<?> typeClass = Class.forName(type.getTypeName());
+////						Object newObj2 = typeClass.getDeclaredConstructor().newInstance();
+////						ArrayList<Object> list = new ArrayList<>();
+////
+////					} else {
+////						field.set(newObj, rs.getObject(metaData.getColumnName(i)));
+////					}
+////				}
+//				result.add(pojo);
 //			}
-//			columns.add(rows);
+//
+////		while (rs.next()) {
+////			rows = new HashMap<>();
+////			for (int i = 1; i <= metaData.getColumnCount(); i++) {
+////				rows.put(metaData.getTableName(i) +"."+ metaData.getColumnLabel(i), rs.getObject(i));
+////			}
+////			columns.add(rows);
+////		}
+////		return columns;
+////		}
+//			return (List<T>) result;
 //		}
-//		return columns;
-//		}
-			return (List<T>) result;
-		}
 
 		public static class InsertExecutor {
 //		private String query;

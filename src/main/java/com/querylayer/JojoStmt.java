@@ -36,7 +36,7 @@ public class JojoStmt {
 		ResultSet rs = stmt.executeQuery(this.qb.finalQuery);
 //		HashMap<String, Object> pojos = new HashMap<>();
 		ResultSetMetaData metaData = rs.getMetaData();
-		return new JojoResult(rs, qb.getMainClass());
+		return new JojoResult(rs, qb, qb.getMainClass());
 	}
 
 	public long executeUpdate() {

@@ -1,5 +1,5 @@
 package com.pojo;
-import java.util.ArrayList;
+import java.util.*;
 import com.pojo.UserEmail;
 
 public class User {
@@ -14,9 +14,8 @@ public class User {
 	public ArrayList<UserEmail> userEmail = new ArrayList<>();
 	public ArrayList<UserPhone> userPhone = new ArrayList<>();
 	
-	
 	public User() {
-		
+		 
 	}
 	
 	public User(String password, String name, String dateOfBirth, int age, String state, String city, int passCheck) {
@@ -109,6 +108,31 @@ public class User {
 		this.userEmail = userEmail;
 	}
 
+	public void setSingleEmail(UserEmail userEmail) {
+		this.userEmail.add(userEmail);
+	}
 	
+	public void setSinglePhone(UserPhone userPhone) {
+		this.userPhone.add(userPhone);
+	}
+	
+	 @Override
+	    public boolean equals(Object obj) {
+	        if (this == obj) return true;
+	        if (obj == null || getClass() != obj.getClass()) return false;
+	        User user = (User) obj;
+	        return age == user.age && Objects.equals(name, user.name);
+	    }
+
+	    // Override hashCode to ensure consistency with equals
+	    @Override
+	    public int hashCode() {
+	        return Objects.hash(name, age);
+	    }
+
+	    @Override
+	    public String toString() {
+	        return "User{name='" + name + "', age=" + age + '}';
+	    }
 	
 }

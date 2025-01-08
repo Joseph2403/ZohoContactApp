@@ -11,10 +11,10 @@ public class JojoResult{
     private final Class<?> clazz;
     private ResultSet rs;
 
-	public JojoResult(ResultSet rs, Class<?> clazz) throws ClassNotFoundException, SQLException, InstantiationException,
+	public JojoResult(ResultSet rs, QueryBuilder2 qb, Class<?> clazz) throws ClassNotFoundException, SQLException, InstantiationException,
 			IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException,
 			SecurityException, NoSuchFieldException {
-		this.result = Executor.executeSelect(rs, clazz).execute();
+		this.result = Executor.executeSelect(rs, clazz).execute(rs, qb, clazz);
 		this.rs = rs;
 		this.clazz = clazz;
 	}
