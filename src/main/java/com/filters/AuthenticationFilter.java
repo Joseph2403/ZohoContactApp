@@ -13,58 +13,33 @@ import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.*;
 
 import com.database.SessionManager;
-
+import com.pojo.Session;
 
 @WebFilter("/AuthenticationFilter")
 public class AuthenticationFilter extends HttpFilter implements Filter {
-       
 
-	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+			throws IOException, ServletException {
 
 		HttpServletRequest httpRequest = (HttpServletRequest) request;
 		HttpServletResponse httpResponse = (HttpServletResponse) response;
 		String uri = httpRequest.getRequestURI();
-		
-		Long userId;
-		String sessionId;
-		
-		
-		if (uri.endsWith("LoginServlet") || uri.endsWith("SignUpServlet")) {
-			sessionId = SessionManager.getSessionId(httpRequest);
-			if (sessionId != null) {
-				try {
-					userId = SessionManager.getUserId(sessionId);
-					if (userId != null) {						
-						httpResponse.sendRedirect("userdashboard.jsp");
-					}
-				} catch (ClassNotFoundException | SQLException e) {
-					e.printStackTrace();
+		Session session;
+		try {
+			if (uri.endsWith("/index.jsp") || uri.endsWith("/login.jsp") || uri.endsWith("/signup.jsp")
+					|| uri.endsWith("/LoginServlet") || uri.endsWith("/SignUpServlet")) {
+				session = SessionManager.getSessionFromCookies(httpRequest);
+				if (session != null) {
+					httpResponse.sendRedirect("userdashboard.jsp");
+				}
+				else {
+					chain.doFilter(httpRequest, httpResponse);
 				}
 			}
-            chain.doFilter(request, response); // Skip the filter
-            return;
-        }
-		
-		sessionId = SessionManager.getSessionId(httpRequest);
-		if (sessionId != null) {
-			try {
-				userId = SessionManager.getUserId(sessionId);
-				
-			} catch (ClassNotFoundException | SQLException e) {
-				e.printStackTrace();
-			}
+		} catch (ClassNotFoundException | SQLException e) {
+			e.printStackTrace();
 		}
-		
-		
-		HttpSession session = httpRequest.getSession(false);
-		if (session.getAttribute("userId") != null) {
-			chain.doFilter(request, response);
-		}
-		else {
-			httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized access");
-		}
-		
-	}
 
+	}
 
 }

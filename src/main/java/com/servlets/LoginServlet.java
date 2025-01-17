@@ -8,7 +8,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
+import com.database.SessionManager;
 import com.database.UserDao;
+import com.pojo.Session;
 import com.pojo.User;
 
 @WebServlet("/LoginServlet")
@@ -22,10 +25,12 @@ public class LoginServlet extends HttpServlet {
         String password = request.getParameter("password");
         
         try {
-            User rs = UserDao.loginUser(email, password);
-            if (rs != null) {
-                HttpSession session = request.getSession();
-                session.setAttribute("userId", rs.getUserId());
+            User user = UserDao.loginUser(email, password);
+            if (user != null) {
+                Session session = SessionManager.getSessionFromCookies(request) != null
+						? SessionManager.getSessionFromCookies(request)
+						: SessionManager.getNewSession(user.getUserId());
+				SessionManager.storeSessionId(response, session.getSessionId());
                 response.sendRedirect("userdashboard.jsp");
             }
             else {

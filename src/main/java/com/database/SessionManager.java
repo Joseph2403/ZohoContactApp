@@ -4,6 +4,8 @@ import java.util.UUID;
 
 import javax.servlet.http.*;
 import java.sql.*;
+
+import com.pojo.Session;
 import com.querylayer.*;
 
 public class SessionManager {
@@ -21,10 +23,40 @@ public class SessionManager {
 		ps.setLong(4, lastUpdatedTime);
 		ps.setLong(5, expiredAt);
 		int rs = ps.executeUpdate();
-		if (rs > 0) {			
+		if (rs > 0) {
 			return sessionId;
 		}
 		return null;
+	}
+
+	public static Session getSessionFromCookies(HttpServletRequest request) throws ClassNotFoundException, SQLException {
+		Session session = null;
+		String sessionId = getSessionIdFromCookies(request);
+		if (sessionId != null) {
+			session = new Session();
+			ResultSet rs = getSessionDetails(sessionId);
+			session.setSessionId(rs.getString(1));
+			session.setUserId(rs.getLong(2));
+			session.setCreatedAt(rs.getLong(3));
+			session.setLastAccessed(rs.getLong(4));
+			session.setExpiresAt(rs.getLong(5));
+		}
+		return session;
+	}
+	
+	public static Session getNewSession(Long userId) throws ClassNotFoundException, SQLException {
+		Session session = null;
+		String sessionId = createSession(userId);
+		if (sessionId != null) {
+			session = new Session();
+			ResultSet rs = getSessionDetails(sessionId);
+			session.setSessionId(rs.getString(1));
+			session.setUserId(rs.getLong(2));
+			session.setCreatedAt(rs.getLong(3));
+			session.setLastAccessed(rs.getLong(4));
+			session.setExpiresAt(rs.getLong(5));
+		}
+		return session;
 	}
 
 	public static boolean validateSession(String sessionId) throws ClassNotFoundException {
@@ -48,7 +80,7 @@ public class SessionManager {
 		response.addCookie(ck);
 	}
 
-	public static String getSessionId(HttpServletRequest request) {
+	public static String getSessionIdFromCookies(HttpServletRequest request) {
 		Cookie[] cookies = request.getCookies();
 		for (int i = 0; i < cookies.length; i++) {
 			if (cookies[i].getName().equals("sessionId")) {
@@ -69,6 +101,17 @@ public class SessionManager {
 		}
 		return null;
 	}
-
+	
+	public static ResultSet getSessionDetails(String sessionId) throws ClassNotFoundException, SQLException {
+		String query = "select * from Session where sessionId = ?;";
+		Connection conn = Executor.connectToDB();
+		PreparedStatement ps = conn.prepareStatement(query);
+		ps.setString(1, sessionId);
+		ResultSet rs = ps.executeQuery();
+		if (rs.next()) {
+			return rs;
+		}
+		return null;
+	}
 
 }
