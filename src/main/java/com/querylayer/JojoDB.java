@@ -119,15 +119,15 @@ public class JojoDB {
 
 		public String getColumnName() {
 			if (columnAlias == null && columnAggregation == null) {
-				return getTableAlias() + "." + columnName;
+				return getTableName() + "." + columnName;
 			} else if (columnAlias == null) {
-				return columnAggregation + "(" + getTableAlias() + "." + columnName + ")";
+				return columnAggregation + "(" + getTableName() + "." + columnName + ")";
 			} else if (columnAggregation == null) {
-				return getTableAlias() + "." + columnName + " AS " + columnAlias;
+				return getTableName() + "." + columnName + " AS " + columnAlias;
 			} else {
 				return columnAggregation.toString().equals("GROUP_CONCAT")
-						? columnAggregation + "(DISTINCT " + getTableAlias() + "." + columnName + ") AS " + columnAlias
-						: columnAggregation + "(" + getTableAlias() + "." + columnName + ") AS " + columnAlias;
+						? columnAggregation + "(DISTINCT " + getTableName() + "." + columnName + ") AS " + columnAlias
+						: columnAggregation + "(" + getTableName() + "." + columnName + ") AS " + columnAlias;
 			}
 		}
 
@@ -174,15 +174,15 @@ public class JojoDB {
 
 		public String getColumnName() {
 			if (columnAlias == null && columnAggregation == null) {
-				return getTableAlias() + "." + columnName;
+				return getTableName() + "." + columnName;
 			} else if (columnAlias == null) {
-				return columnAggregation + "(" + getTableAlias() + "." + columnName + ")";
+				return columnAggregation + "(" + getTableName() + "." + columnName + ")";
 			} else if (columnAggregation == null) {
-				return getTableAlias() + "." + columnName + " AS " + columnAlias;
+				return getTableName() + "." + columnName + " AS " + columnAlias;
 			} else {
 				return columnAggregation.toString().equals("GROUP_CONCAT")
-						? columnAggregation + "(DISTINCT " + getTableAlias() + "." + columnName + ") AS " + columnAlias
-						: columnAggregation + "(" + getTableAlias() + "." + columnName + ") AS " + columnAlias;
+						? columnAggregation + "(DISTINCT " + getTableName() + "." + columnName + ") AS " + columnAlias
+						: columnAggregation + "(" + getTableName() + "." + columnName + ") AS " + columnAlias;
 			}
 		}
 
@@ -229,15 +229,15 @@ public class JojoDB {
 
 		public String getColumnName() {
 			if (columnAlias == null && columnAggregation == null) {
-				return getTableAlias() + "." + columnName;
+				return getTableName() + "." + columnName;
 			} else if (columnAlias == null) {
-				return columnAggregation + "(" + getTableAlias() + "." + columnName + ")";
+				return columnAggregation + "(" + getTableName() + "." + columnName + ")";
 			} else if (columnAggregation == null) {
-				return getTableAlias() + "." + columnName + " AS " + columnAlias;
+				return getTableName() + "." + columnName + " AS " + columnAlias;
 			} else {
 				return columnAggregation.toString().equals("GROUP_CONCAT")
-						? columnAggregation + "(DISTINCT " + getTableAlias() + "." + columnName + ") AS " + columnAlias
-						: columnAggregation + "(" + getTableAlias() + "." + columnName + ") AS " + columnAlias;
+						? columnAggregation + "(DISTINCT " + getTableName() + "." + columnName + ") AS " + columnAlias
+						: columnAggregation + "(" + getTableName() + "." + columnName + ") AS " + columnAlias;
 			}
 		}
 
@@ -284,15 +284,15 @@ public class JojoDB {
 
 		public String getColumnName() {
 			if (columnAlias == null && columnAggregation == null) {
-				return getTableAlias() + "." + columnName;
+				return getTableName() + "." + columnName;
 			} else if (columnAlias == null) {
-				return columnAggregation + "(" + getTableAlias() + "." + columnName + ")";
+				return columnAggregation + "(" + getTableName() + "." + columnName + ")";
 			} else if (columnAggregation == null) {
-				return getTableAlias() + "." + columnName + " AS " + columnAlias;
+				return getTableName() + "." + columnName + " AS " + columnAlias;
 			} else {
 				return columnAggregation.toString().equals("GROUP_CONCAT")
-						? columnAggregation + "(DISTINCT " + getTableAlias() + "." + columnName + ") AS " + columnAlias
-						: columnAggregation + "(" + getTableAlias() + "." + columnName + ") AS " + columnAlias;
+						? columnAggregation + "(DISTINCT " + getTableName() + "." + columnName + ") AS " + columnAlias
+						: columnAggregation + "(" + getTableName() + "." + columnName + ") AS " + columnAlias;
 			}
 		}
 
@@ -339,15 +339,15 @@ public class JojoDB {
 
 		public String getColumnName() {
 			if (columnAlias == null && columnAggregation == null) {
-				return getTableAlias() + "." + columnName;
+				return getTableName() + "." + columnName;
 			} else if (columnAlias == null) {
-				return columnAggregation + "(" + getTableAlias() + "." + columnName + ")";
+				return columnAggregation + "(" + getTableName() + "." + columnName + ")";
 			} else if (columnAggregation == null) {
-				return getTableAlias() + "." + columnName + " AS " + columnAlias;
+				return getTableName() + "." + columnName + " AS " + columnAlias;
 			} else {
 				return columnAggregation.toString().equals("GROUP_CONCAT")
-						? columnAggregation + "(DISTINCT " + getTableAlias() + "." + columnName + ") AS " + columnAlias
-						: columnAggregation + "(" + getTableAlias() + "." + columnName + ") AS " + columnAlias;
+						? columnAggregation + "(DISTINCT " + getTableName() + "." + columnName + ") AS " + columnAlias
+						: columnAggregation + "(" + getTableName() + "." + columnName + ") AS " + columnAlias;
 			}
 		}
 

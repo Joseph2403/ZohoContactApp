@@ -194,12 +194,17 @@ public class QueryBuilder2 {
 		public String build() {
 			this.query.append("SELECT ");
 			int i = 1;
-			for (EnumColumn column : this.columns) {
-				this.query.append(column.getColumnName());
-				if (i < this.columns.size()) {
-					this.query.append(", ");
+			if (this.columns.size() == 0) {
+				this.query.append("*");
+			}
+			else {
+				for (EnumColumn column : this.columns) {
+					this.query.append(column.getColumnName());
+					if (i < this.columns.size()) {
+						this.query.append(", ");
+					}
+					i++;
 				}
-				i++;
 			}
 			this.query.append(" FROM " + this.table);
 			tables.add(this.table);

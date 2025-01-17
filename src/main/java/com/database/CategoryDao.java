@@ -22,29 +22,29 @@ public class CategoryDao {
         return conn;
     }
     
-    public static Category getCategoryDetails(long categoryId) throws ClassNotFoundException, SQLException {
-    	Connection conn = connectToDB();
-    	String query = "select c.*, group_concat(contactId) contactIds from Category c join CategoryContact cc on c.categoryId = cc.categoryId where c.categoryId = ? group by c.categoryId;";
-    	PreparedStatement ps = conn.prepareStatement(query);
-    	ps.setLong(1, categoryId);
-    	ResultSet rs = ps.executeQuery();
-    	if (rs.next()) {
-    		Category category = new Category(
-    				rs.getString("categoryName")
-    				);
-    		ArrayList<Contact> contacts = new ArrayList<>();
-    		String[] dbContactIds = ((String) rs.getString("contactIds")).split(",");
-    		
-    		for (int i=0; i < dbContactIds.length; i++) {
-    			contacts.add(ContactDao.getContactPojo(Long.parseLong(dbContactIds[i])));
-    		}
-    		
-    		category.setCategoryContacts(contacts);
-    		category.setCategoryId(rs.getLong("categoryId"));
-    		return category;
-    	}
-    	return null;
-    }
+//    public static Category getCategoryDetails(long categoryId) throws ClassNotFoundException, SQLException {
+//    	Connection conn = connectToDB();
+//    	String query = "select c.*, group_concat(contactId) contactIds from Category c join CategoryContact cc on c.categoryId = cc.categoryId where c.categoryId = ? group by c.categoryId;";
+//    	PreparedStatement ps = conn.prepareStatement(query);
+//    	ps.setLong(1, categoryId);
+//    	ResultSet rs = ps.executeQuery();
+//    	if (rs.next()) {
+//    		Category category = new Category(
+//    				rs.getString("categoryName")
+//    				);
+//    		ArrayList<Contact> contacts = new ArrayList<>();
+//    		String[] dbContactIds = ((String) rs.getString("contactIds")).split(",");
+//    		
+//    		for (int i=0; i < dbContactIds.length; i++) {
+//    			contacts.add(ContactDao.getContactPojo(Long.parseLong(dbContactIds[i])));
+//    		}
+//    		
+//    		category.setCategoryContacts(contacts);
+//    		category.setCategoryId(rs.getLong("categoryId"));
+//    		return category;
+//    	}
+//    	return null;
+//    }
     
     public static ArrayList<Category> getCategories(long userId) throws SQLException, ClassNotFoundException {
     	
@@ -58,19 +58,19 @@ public class CategoryDao {
     		do {
     		String[] dbContactIds = new String[0];
     		Category category = new Category(
+    				rs.getLong("categoryId"),
+    				rs.getLong("userId"),
     				rs.getString("categoryName")
     				);
-    		ArrayList<Contact> contacts = new ArrayList<>();
-    		if (rs.getString("contactIds") != null) {
-    		dbContactIds = rs.getString("contactIds").split(",");
-    		} 
-    		
-    		for (int i=0; i < dbContactIds.length; i++) {
-    			contacts.add(ContactDao.getContactPojo(Long.parseLong(dbContactIds[i])));
-    		}
-    		
-    		category.setCategoryContacts(contacts);
-    		category.setCategoryId(rs.getLong("categoryId"));
+//    		ArrayList<Contact> contacts = new ArrayList<>();
+//    		if (rs.getString("contactIds") != null) {
+//    		dbContactIds = rs.getString("contactIds").split(",");
+//    		} 
+//    		
+//    		for (int i=0; i < dbContactIds.length; i++) {
+//    			contacts.add(ContactDao.getContactPojo(Long.parseLong(dbContactIds[i])));
+//    		}
+
     		categories.add(category);
     		} while (rs.next());
     		return categories;

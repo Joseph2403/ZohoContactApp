@@ -4,8 +4,8 @@
 <% 
 long contactId = (long) request.getAttribute("contactId");
 Contact contact = (Contact) ContactDao.getContactPojo(contactId);
-ArrayList<String> emails = contact.getContactEmail();
-ArrayList<Long> phones = contact.getContactPhone();
+ArrayList<ContactEmail> emails = contact.getContactEmail();
+ArrayList<ContactPhone> phones = contact.getContactPhone();
 %>
 <!DOCTYPE html>
 <html>
@@ -27,18 +27,18 @@ City:<%= contact.getCity() %><br>
 <br>
 <h2>Emails</h2>
 <%
-for (String email: emails) {
+for (ContactEmail email: emails) {
 %>
-<p><%= email %></p>
+<p><%= email.getContactEmail() %></p>
 <%
 }
 %>
 <br>
 <h2>Phone Numbers</h2>
 <%
-for (long phone: phones) {
+for (ContactPhone phone: phones) {
 %>
-<p><%= phone %></p>
+<p><%= phone.getContactPhone() %></p>
 <%
 }
 %>

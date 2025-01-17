@@ -33,8 +33,6 @@ public class DemoExecutor {
 		Statement stmt = conn.createStatement();
 		ResultSet rs = stmt.executeQuery(query);
 		ResultSetMetaData metaData = rs.getMetaData();
-		String tableName = metaData.getTableName(1).toLowerCase();
-		int colCount = metaData.getColumnCount();
 		while (rs.next()) {
 			Long uId = rs.getLong(1);
 			String wId = metaData.getColumnName(1);			

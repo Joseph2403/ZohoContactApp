@@ -24,6 +24,8 @@ public class ContactDao {
         ps.setLong(1, userId);
         ResultSet rs = ps.executeQuery();
         if(rs.next()) {
+        	ContactEmail contactEmail;
+        	ContactPhone contactPhone;
         	do {
         	Contact contact = new Contact(
         			rs.getString("name"),
@@ -32,18 +34,20 @@ public class ContactDao {
         			rs.getString("state"),
         			rs.getString("city")
         			);
-        	ArrayList<String> contactEmails = new ArrayList<>();
-        	ArrayList<Long> contactPhones = new ArrayList<>();
+        	ArrayList<ContactEmail> contactEmails = new ArrayList<>();
+        	ArrayList<ContactPhone> contactPhones = new ArrayList<>();
         	String[] dbEmails = ((String) rs.getString("contactEmails")).split(",");
         	String[] dbPhones = ((String) rs.getString("contactPhones")).split(",");
         	
         	for (int i=0; i < dbEmails.length; i++) {
-        		contactEmails.add(dbEmails[i]);
+        		contactEmail =  new ContactEmail(rs.getLong("contactId"), rs.getString("contactEmail"));
+        		contactEmails.add(contactEmail);
         	}
         	
         	
         	for (int j=0; j < dbPhones.length; j++) {
-        		contactPhones.add(Long.parseLong(dbPhones[j]));
+        		contactPhone = new ContactPhone(rs.getLong("contactId"), rs.getLong("contactPhone"));
+        		contactPhones.add(contactPhone);
         	}
         	contact.setContactId(rs.getLong("contactId"));
         	contact.setContactEmail(contactEmails);
@@ -62,6 +66,8 @@ public class ContactDao {
         ps.setLong(1, contactId);
         ResultSet rs = ps.executeQuery();
         if(rs.next()) {
+        	ContactEmail contactEmail;
+        	ContactPhone contactPhone;
         	Contact contact = new Contact(
         			rs.getString("name"),
         			rs.getInt("age"),
@@ -69,18 +75,22 @@ public class ContactDao {
         			rs.getString("state"),
         			rs.getString("city")
         			);
-        	ArrayList<String> contactEmails = new ArrayList<>();
-        	ArrayList<Long> contactPhones = new ArrayList<>();
+        	ArrayList<ContactEmail> contactEmails = new ArrayList<>();
+        	ArrayList<ContactPhone> contactPhones = new ArrayList<>();
         	String[] dbEmails = ((String) rs.getString("contactEmails")).split(",");
         	String[] dbPhones = ((String) rs.getString("contactPhones")).split(",");
         	
         	for (int i=0; i < dbEmails.length; i++) {
-        		contactEmails.add(dbEmails[i]);
+        		contactEmail =  new ContactEmail(rs.getLong("contactId"), rs.getString("contactEmail"));
+        		contactEmails.add(contactEmail);
         	}
-        		
+        	
+        	
         	for (int j=0; j < dbPhones.length; j++) {
-        		contactPhones.add(Long.parseLong(dbPhones[j]));
+        		contactPhone = new ContactPhone(rs.getLong("contactId"), rs.getLong("contactPhone"));
+        		contactPhones.add(contactPhone);
         	}
+        	
         	contact.setContactId(rs.getLong("contactId"));
         	contact.setContactEmail(contactEmails);
         	contact.setContactPhone(contactPhones);

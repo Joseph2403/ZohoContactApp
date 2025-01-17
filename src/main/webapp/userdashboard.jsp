@@ -7,7 +7,7 @@ if (session.getAttribute("userId") != null) {
 	long userId = (long) session.getAttribute("userId");
 	User user = UserDao.getUserPojo(userId);
 	ArrayList<UserEmail> emails = user.getUserEmail();
-	ArrayList<Long> phones = user.getUserPhone();
+	ArrayList<UserPhone> phones = user.getUserPhone();
 if (user != null) {
 ArrayList<Category> categories = CategoryDao.getCategories(userId);
 %>
@@ -116,11 +116,11 @@ function removePhone() {
 <%  
 for (UserEmail email: emails) {
 %>
-<%= email.getEmail() %>
-<% if (email.isPrime()) { %>
+<%= email.getUserEmail() %>
+<% if (email.getIsPrime()) { %>
  (PRIMARY)
 <% } %>
-<input type="submit" name="<%= email.getEmail() %>" value="❌" onclick="deleteClickedEmail(this, event)">
+<input type="submit" name="<%= email.getUserEmail() %>" value="❌" onclick="deleteClickedEmail(this, event)">
 <br><br>
 <%
 }
@@ -131,7 +131,7 @@ for (UserEmail email: emails) {
 <form name="myPhoneForm"action="DeletePhoneServlet" method="post">
 <h3>Phone Numbers</h3>
 <% 
-for (Long phone: phones) {
+for (UserPhone phone: phones) {
 %>
 <div>
 <%= phone %>

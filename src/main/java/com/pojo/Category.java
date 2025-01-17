@@ -1,16 +1,18 @@
 package com.pojo;
 
-import java.util.ArrayList;
-
 public class Category {
-	public long categoryId;
-	public String categoryName;
-	public ArrayList<Contact> categoryContacts = new ArrayList<>();
-	
-	public Category () {
-		
+	private Long categoryId;
+	private Long userId;
+	private String categoryName;
+//	public ArrayList<Contact> categoryContacts = new ArrayList<>();
+
+	public Category() {
+
 	}
-	public Category (String name) {
+
+	public Category(Long categoryId, Long userId, String name) {
+		this.categoryId = categoryId;
+		this.userId = userId;
 		this.categoryName = name;
 	}
 
@@ -18,25 +20,24 @@ public class Category {
 		return categoryName;
 	}
 
+	public Long getUserId() {
+		return userId;
+	}
+	
+	public Long getCategoryId() {
+		return categoryId;
+	}
+
+	public void setUserId(Long userId) {
+		this.userId = userId;
+	}
+
+	public void setCategoryId(Long categoryId) {
+		this.categoryId = categoryId;
+	}
+
 	public void setCategoryName(String categoryName) {
 		this.categoryName = categoryName;
 	}
 
-	public ArrayList<Contact> getCategoryContacts() {
-		return categoryContacts;
-	}
-
-	public void setCategoryContacts(ArrayList<Contact> categoryContacts) {
-		this.categoryContacts = categoryContacts;
-	}
-
-	public long getCategoryId() {
-		return categoryId;
-	}
-
-	public void setCategoryId(long categoryId) {
-		this.categoryId = categoryId;
-	}
-	
-	
 }

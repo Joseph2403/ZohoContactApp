@@ -72,23 +72,30 @@ public class JavaTest {
 		// ----------DB Operations 2----------
 		Connection conn = connectToDB();
 		QueryBuilder2 qb = new QueryBuilder2();
-		qb.select(JojoDB.UserTab.ALL, JojoDB.UserEmailTab.ALL, JojoDB.UserPhoneTab.ALL).from(JojoDB.Table.USER)
+		qb.select().from(JojoDB.Table.USER)
 				.join(JojoDB.JoinType.INNER_JOIN, JojoDB.Table.USEREMAIL, JojoDB.UserTab.USERID,
 						JojoDB.UserEmailTab.USERID)
 				.join(JojoDB.JoinType.INNER_JOIN, JojoDB.Table.USERPHONE, JojoDB.UserTab.USERID,
-						JojoDB.UserPhoneTab.USERID).build();
-
+						JojoDB.UserPhoneTab.USERID)
+				.build();
+		QueryBuilder2 qb2 = new QueryBuilder2();
+		qb2.select().from(JojoDB.Table.CONTACT)
+				.join(JojoDB.JoinType.INNER_JOIN, JojoDB.Table.CONTACTEMAIL, JojoDB.ContactTab.CONTACTID,
+						JojoDB.ContactEmailTab.CONTACTID)
+				.where(JojoDB.ContactTab.USERID, JojoDB.Comparisons.EQUALS, "6").build();
+		System.out.println(qb2.finalQuery);
 //		System.out.println(qb.finalQuery);
-		Statement stmt = conn.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
-		ResultSet rs = stmt.executeQuery(qb.finalQuery);
-		ResultSetMetaData metaData = rs.getMetaData();
-//		
-		DemoExecutor de = new DemoExecutor();
-		List<User> pojos = de.umarPopulator(User.class, null, "siudhfsd");
-		for (User pojo : pojos) {
-			ArrayList<UserEmail> emails = pojo.getUserEmail();
-			System.out.println(pojo.name+"\nEmail Count: "+pojo.getUserEmail().size()+"\nPhone Count: "+pojo.getUserPhone().size()+"\n");
-		}
+//		Statement stmt = conn.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+//		ResultSet rs = stmt.executeQuery(qb.finalQuery);
+//		ResultSetMetaData metaData = rs.getMetaData();
+////		
+//		DemoExecutor de = new DemoExecutor();
+//		List<User> pojos = de.umarPopulator(User.class, null, "siudhfsd");
+//		for (User pojo : pojos) {
+//			ArrayList<UserEmail> emails = pojo.getUserEmail();
+//			System.out.println(pojo.name + "\nEmail Count: " + pojo.getUserEmail().size() + "\nPhone Count: "
+//					+ pojo.getUserPhone().size() + "\n");
+//		}
 //		System.out.println(pojos.size());
 
 //		int row = rs.getRow();

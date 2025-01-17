@@ -28,25 +28,41 @@ public class JojoStmt {
 	public <T> JojoResult executeQuery()
 			throws ClassNotFoundException, InstantiationException, IllegalAccessException, IllegalArgumentException,
 			InvocationTargetException, NoSuchMethodException, SecurityException, SQLException, NoSuchFieldException {
-		Connection conn = connectToDB();
-		Statement stmt = conn.createStatement(
-				ResultSet.TYPE_SCROLL_INSENSITIVE,
-			    ResultSet.CONCUR_READ_ONLY
-			    );
-		ResultSet rs = stmt.executeQuery(this.qb.finalQuery);
-//		HashMap<String, Object> pojos = new HashMap<>();
-		ResultSetMetaData metaData = rs.getMetaData();
-		return new JojoResult(rs, qb, qb.getMainClass());
-	}
+		try (Connection conn = connectToDB();
+			Statement stmt = conn.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);) {
 
-	public long executeUpdate() {
-		return 0;
-	}
-
-	public long executeUpdate(Boolean value) {
-		if (value) {
-
+			ResultSet rs = stmt.executeQuery(this.qb.finalQuery);
+			ResultSetMetaData metaData = rs.getMetaData();
+			return new JojoResult(rs, qb, qb.getMainClass());
 		}
+	}
+
+	public long executeUpdate() throws ClassNotFoundException, SQLException {
+		Connection conn = connectToDB();
+		Statement stmt = conn.createStatement();
+		int rs = stmt.executeUpdate(this.qb.finalQuery);
+		return rs;
+	}
+
+	public long executeUpdate(Boolean value) throws ClassNotFoundException, SQLException {
+		if (value) {
+			long key = -1;
+			try (Connection conn = connectToDB();
+					Statement stmt = conn.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY)) {
+				long rs = stmt.executeUpdate(this.qb.finalQuery, Statement.RETURN_GENERATED_KEYS);
+
+				if (rs > 0) {
+					try (ResultSet keys = stmt.getGeneratedKeys()) {
+						if (keys.next()) {
+							key = keys.getLong(1);
+						}
+					}
+				}
+			}
+
+			return key;
+		}
+
 		return 0;
 	}
 

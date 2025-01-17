@@ -328,7 +328,7 @@ public class Executor {
 //		}
 
 		public static class InsertExecutor {
-//		private String query;
+//			private String query;
 		}
 	}
 }

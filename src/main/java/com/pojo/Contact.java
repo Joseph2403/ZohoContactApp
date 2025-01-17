@@ -10,8 +10,8 @@ public class Contact {
 	public String dateOfBirth;
 	public String state;
 	public String city;
-	ArrayList<String> contactEmail = new ArrayList<>();
-	ArrayList<Long> contactPhone = new ArrayList<>();
+	ArrayList<ContactEmail> contactEmail = new ArrayList<>();
+	ArrayList<ContactPhone> contactPhone = new ArrayList<>();
 	public Contact () {
 		
 	}
@@ -79,19 +79,19 @@ public class Contact {
 		this.city = city;
 	}
 
-	public ArrayList<String> getContactEmail() {
+	public ArrayList<ContactEmail> getContactEmail() {
 		return contactEmail;
 	}
 
-	public void setContactEmail(ArrayList<String> contactEmail) {
+	public void setContactEmail(ArrayList<ContactEmail> contactEmail) {
 		this.contactEmail = contactEmail;
 	}
 
-	public ArrayList<Long> getContactPhone() {
+	public ArrayList<ContactPhone> getContactPhone() {
 		return contactPhone;
 	}
 
-	public void setContactPhone(ArrayList<Long> contactPhone) {
+	public void setContactPhone(ArrayList<ContactPhone> contactPhone) {
 		this.contactPhone = contactPhone;
 	}
 

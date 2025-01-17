@@ -30,10 +30,11 @@ public class UserDao {
 		ResultSet rs = ps.executeQuery();
 		if (rs.next()) {
 			UserEmail userEmail;
+			UserPhone userPhone;
 			User user = new User(rs.getString("password"), rs.getString("name"), rs.getString("dateOfBirth"),
 					rs.getInt("age"), rs.getString("state"), rs.getString("city"), rs.getInt("passCheck"));
 			ArrayList<UserEmail> userEmails = new ArrayList<>();
-			ArrayList<Long> userPhones = new ArrayList<>();
+			ArrayList<UserPhone> userPhones = new ArrayList<>();
 			System.out.println("PrimaryCheck " + rs.getString("isPrime"));
 			String[] dbEmails = rs.getString("userEmails").split(",");
 			String[] dbIsPrimes = rs.getString("isPrime").split(",");
@@ -41,12 +42,13 @@ public class UserDao {
 
 			for (int i = 0; i < dbEmails.length; i++) {
 				String boolValue = dbIsPrimes[i].equals("1") ? "true" : "false";
-				userEmail = new UserEmail(dbEmails[i], Boolean.parseBoolean(boolValue));
+				userEmail = new UserEmail(userId, dbEmails[i], Boolean.parseBoolean(boolValue));
 				userEmails.add(userEmail);
 			}
 
 			for (int j = 0; j < dbPhones.length; j++) {
-				userPhones.add(Long.parseLong(dbPhones[j]));
+				userPhone = new UserPhone(userId, Long.parseLong(dbPhones[j]));
+				userPhones.add(userPhone);
 			}
 			user.setUserId(userId);
 			user.setUserEmail(userEmails);

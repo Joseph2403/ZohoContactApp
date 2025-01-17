@@ -46,10 +46,10 @@ public class SignUpServlet extends HttpServlet {
         	}
         	else {
         		User user = new User(hashedPassword, name, dateOfBirth, age, state, city, 1);
-        		UserEmail userEmail = new UserEmail(email, true);
         		ArrayList<UserEmail> emails = new ArrayList<>();
-        		emails.add(userEmail);
         		long userId = UserDao.insertUser(user);
+        		UserEmail userEmail = new UserEmail(userId, email, true);
+        		emails.add(userEmail);
     			if (UserDao.insertUserEmail(userId, email, true) && UserDao.insertUserPhone(userId, phoneNumber)) {
     				HttpSession session = request.getSession();
     				session.setAttribute("userId", userId);
