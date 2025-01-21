@@ -17,5 +17,6 @@
 	<classpathentry kind="lib" path="/home/christ-tt0478/Downloads/argon2-jvm-2.6.jar"/>
 	<classpathentry kind="lib" path="/home/christ-tt0478/Downloads/jna-5.13.0.jar"/>
 	<classpathentry kind="lib" path="/home/christ-tt0478/Downloads/jna-platform-5.13.0.jar"/>
+	<classpathentry kind="lib" path="/home/christ-tt0478/Downloads/json-20140107.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

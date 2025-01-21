@@ -13,10 +13,18 @@ public class Executor {
 	private static String password = "root";
 	private static String driver = "com.mysql.cj.jdbc.Driver";
 
-	public static Connection connectToDB() throws SQLException, ClassNotFoundException {
-		Class.forName(driver);
-		Connection conn = DriverManager.getConnection(url, user, password);
-		return conn;
+	public static Connection connectToDB(){
+		try {
+			Connection conn;
+			Class.forName(driver);
+			conn = DriverManager.getConnection(url, user, password);
+			return conn;
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	public static SelectExecutor executeSelect(ResultSet rs, Class<?> clazz) {

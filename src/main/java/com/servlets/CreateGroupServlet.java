@@ -19,8 +19,8 @@ public class CreateGroupServlet extends HttpServlet {
 			response.sendRedirect("userdashboard.jsp");
 		}
 		else {
-		HttpSession session = request.getSession();
-		long userId = (long) session.getAttribute("userId");
+			String sessionId = SessionManager.getSessionIdFromCookies(request);
+			Long userId = SessionManager.getUserId(sessionId);
 		try {
 			Connection conn = UserDao.connectToDB();
 			String query = "insert into Category (userId, categoryName) values (?, ?);";

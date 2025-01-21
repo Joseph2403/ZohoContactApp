@@ -15,30 +15,49 @@ public class TestExecutor {
 
 		QueryBuilder2 qb = new QueryBuilder2();
 		qb.select().from(JojoDB.Table.USER)
-				.join(JojoDB.JoinType.INNER_JOIN, JojoDB.Table.USEREMAIL, JojoDB.UserTab.USERID,
+				.join(JojoDB.JoinType.LEFT_JOIN, JojoDB.Table.USEREMAIL, JojoDB.UserTab.USERID,
 						JojoDB.UserEmailTab.USERID)
-				.where(JojoDB.UserTab.USERID, JojoDB.Comparisons.EQUALS, "7").build();
+				.join(JojoDB.JoinType.LEFT_JOIN, JojoDB.Table.USERPHONE, JojoDB.UserTab.USERID,
+						JojoDB.UserPhoneTab.USERID)
+				.where(JojoDB.UserTab.USERID, JojoDB.Comparisons.EQUALS, "15").build();
 		
-		QueryBuilder2 qb2 = new QueryBuilder2();
-		qb2.select().from(JojoDB.Table.CONTACT)
-				.join(JojoDB.JoinType.INNER_JOIN, JojoDB.Table.CONTACTEMAIL, JojoDB.ContactTab.CONTACTID,
-						JojoDB.ContactEmailTab.CONTACTID)
-				.where(JojoDB.ContactTab.USERID, JojoDB.Comparisons.EQUALS, "6").build();
-		
-		JojoStmt js = new JojoStmt(qb2);
+		JojoStmt js = new JojoStmt(qb);
 		JojoResult jr = js.executeQuery();
 		while (jr.next()) {
-			Contact pojo = jr.getPojo();
-			System.out.println(pojo.userId + ", " + pojo.name + ", " + pojo.age + ", " + pojo.city);
-			ArrayList<ContactEmail> emails = pojo.getContactEmail();
-			for (ContactEmail ue : emails) {
-				System.out.print(ue.getContactEmail() + ", ");
+			User pojo = jr.getPojo();
+			ArrayList<UserEmail> userEmails = pojo.getUserEmail();
+			ArrayList<UserPhone> userPhones = pojo.getUserPhone();
+			for (UserEmail userEmail: userEmails) {				
+				System.out.println(userEmail.getUserEmail()+" - "+userEmail.getIsPrime());
 			}
-			System.out.println();
-//			for (UserEmail ue : emails) {
-//				System.out.println(ue.getUserEmail() + ", " + ue.getIsPrime());
-//			}
+			System.out.println("-------------------------------------------");
+			for (UserPhone userPhone: userPhones) {
+				System.out.println(userPhone.getUserPhone());
+			}
 		}
+		
+		
+//		QueryBuilder2 qb2 = new QueryBuilder2();
+//		qb2.select().from(JojoDB.Table.CONTACT)
+//				.join(JojoDB.JoinType.INNER_JOIN, JojoDB.Table.CONTACTEMAIL, JojoDB.ContactTab.CONTACTID,
+//						JojoDB.ContactEmailTab.CONTACTID)
+//				.where(JojoDB.ContactTab.USERID, JojoDB.Comparisons.EQUALS, "6").build();
+		
+//		JojoStmt js = new JojoStmt(qb2);
+//		JojoResult jr = js.executeQuery();
+//		while (jr.next()) {
+//			Contact pojo = jr.getPojo();
+//			System.out.println(pojo.userId + ", " + pojo.name + ", " + pojo.age + ", " + pojo.city);
+//			ArrayList<ContactEmail> emails = pojo.getContactEmail();
+//			for (ContactEmail ue : emails) {
+//				System.out.print(ue.getContactEmail() + ", ");
+//			}
+//			System.out.println();
+//			
+////			for (UserEmail ue : emails) {
+////				System.out.println(ue.getUserEmail() + ", " + ue.getIsPrime());
+////			}
+//		}
 
 //		System.out.println(qb.finalQuery);
 

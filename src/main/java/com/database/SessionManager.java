@@ -9,6 +9,20 @@ import com.pojo.Session;
 import com.querylayer.*;
 
 public class SessionManager {
+	public static Long expiredAt = null;
+
+	public static void updateExpiry() {
+		expiredAt = System.currentTimeMillis() + (30 * 60 * 1000);
+	}
+
+	public static boolean validateExpiry() {
+		return System.currentTimeMillis() < expiredAt;
+	}
+
+	public static void delExpiry() {
+		expiredAt = null;
+	}
+
 	public static String createSession(long userId) throws ClassNotFoundException, SQLException {
 		String sessionId = UUID.randomUUID().toString();
 		long currentTime = System.currentTimeMillis();
@@ -29,7 +43,8 @@ public class SessionManager {
 		return null;
 	}
 
-	public static Session getSessionFromCookies(HttpServletRequest request) throws ClassNotFoundException, SQLException {
+	public static Session getSessionFromCookies(HttpServletRequest request)
+			throws ClassNotFoundException, SQLException {
 		Session session = null;
 		String sessionId = getSessionIdFromCookies(request);
 		if (sessionId != null) {
@@ -43,7 +58,7 @@ public class SessionManager {
 		}
 		return session;
 	}
-	
+
 	public static Session getNewSession(Long userId) throws ClassNotFoundException, SQLException {
 		Session session = null;
 		String sessionId = createSession(userId);
@@ -80,28 +95,51 @@ public class SessionManager {
 		response.addCookie(ck);
 	}
 
+	public static void deleteSessionFromCookies(HttpServletResponse response) {
+		Cookie ck = new Cookie("sessionId", "");
+		ck.setMaxAge(0);
+		response.addCookie(ck);
+	}
+
+	public static boolean deleteSessionFromDb(String sessionId) throws ClassNotFoundException {
+		String query = "DELETE FROM Session WHERE sessionId = ?";
+		try (Connection conn = Executor.connectToDB(); PreparedStatement stmt = conn.prepareStatement(query)) {
+			stmt.setString(1, sessionId);
+			int rs = stmt.executeUpdate();
+			return rs > 0;
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+
 	public static String getSessionIdFromCookies(HttpServletRequest request) {
 		Cookie[] cookies = request.getCookies();
-		for (int i = 0; i < cookies.length; i++) {
-			if (cookies[i].getName().equals("sessionId")) {
-				return cookies[i].getValue();
+		if (cookies != null) {
+			for (int i = 0; i < cookies.length; i++) {
+				if (cookies[i].getName().equals("sessionId")) {
+					return cookies[i].getValue();
+				}
 			}
+		}
+
+		return null;
+	}
+
+	public static Long getUserId(String sessionId){
+		String query = "select userId from Session where sessionId = ?;";
+		try (Connection conn = Executor.connectToDB(); PreparedStatement ps = conn.prepareStatement(query);) {
+			ps.setString(1, sessionId);
+			ResultSet rs = ps.executeQuery();
+			if (rs.next()) {
+				return rs.getLong("userId");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 		return null;
 	}
 
-	public static Long getUserId(String sessionId) throws ClassNotFoundException, SQLException {
-		String query = "select userId from Session where sessionId = ?;";
-		Connection conn = Executor.connectToDB();
-		PreparedStatement ps = conn.prepareStatement(query);
-		ps.setString(1, sessionId);
-		ResultSet rs = ps.executeQuery();
-		if (rs.next()) {
-			return rs.getLong("userId");
-		}
-		return null;
-	}
-	
 	public static ResultSet getSessionDetails(String sessionId) throws ClassNotFoundException, SQLException {
 		String query = "select * from Session where sessionId = ?;";
 		Connection conn = Executor.connectToDB();

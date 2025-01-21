@@ -2,7 +2,8 @@
     pageEncoding="UTF-8"%>
 <%@ page import="com.database.*, com.pojo.*, java.util.*" %>
 <% 
-long userId = (long) session.getAttribute("userId");
+String sessionId = SessionManager.getSessionIdFromCookies(request);
+Long userId = SessionManager.getUserId(sessionId);
 User user = UserDao.getUserPojo(userId);
 %>
 <!DOCTYPE html>

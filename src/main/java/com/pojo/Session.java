@@ -1,11 +1,14 @@
 package com.pojo;
 
+import java.util.HashMap;
+
 public class Session {
 	private String sessionId;
 	private Long userId;
 	private Long createdAt;
 	private Long lastAccessed;
 	private Long expiresAt;
+	private HashMap<String, Object> sessionData;
 
 	public String getSessionId() {
 		return sessionId;

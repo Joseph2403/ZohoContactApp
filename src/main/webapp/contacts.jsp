@@ -1,8 +1,9 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
-<%@ page import="java.sql.*, com.database.ContactDao, java.util.*, com.pojo.*" %>
+<%@ page import="java.sql.*, com.database.*, java.util.*, com.pojo.*" %>
 <% 
-long userId = (long) session.getAttribute("userId");
+String sessionId = SessionManager.getSessionIdFromCookies(request);
+Long userId = SessionManager.getUserId(sessionId);
 ArrayList<Contact> contacts = ContactDao.getUserContactPojo(userId);
 %>
 <!DOCTYPE html>

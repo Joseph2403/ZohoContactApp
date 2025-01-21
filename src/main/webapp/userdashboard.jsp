@@ -150,7 +150,7 @@ if (SessionManager.getUserId(sessionId) != null) {
 			for (UserPhone phone : phones) {
 			%>
 			<div>
-				<%=phone%>
+				<%=phone.getUserPhone()%>
 				<input type="submit" name="<%=phone%>" value="❌"
 					onclick="deleteClickedPhone(this, event)">
 			</div>

@@ -1,9 +1,15 @@
 package com.database;
 
+import java.lang.reflect.InvocationTargetException;
 import java.sql.*;
 import com.pojo.*;
+import com.querylayer.EnumColumn;
 import com.querylayer.JojoDB;
+import com.querylayer.JojoDB.Table;
+import com.querylayer.JojoResult;
+import com.querylayer.JojoStmt;
 import com.querylayer.QueryBuilder;
+import com.querylayer.QueryBuilder2;
 
 import de.mkammerer.argon2.Argon2;
 import de.mkammerer.argon2.Argon2Factory;
@@ -22,39 +28,56 @@ public class UserDao {
 		return conn;
 	}
 
-	public static User getUserPojo(long userId) throws ClassNotFoundException, SQLException {
-		Connection conn = connectToDB();
-		String query = "SELECT u.*, GROUP_CONCAT(DISTINCT ue.userEmail) AS userEmails, GROUP_CONCAT(DISTINCT ue.isPrime) AS isPrime, GROUP_CONCAT(DISTINCT up.userPhone) AS userPhones FROM User u LEFT JOIN UserEmail ue ON u.userId = ue.userId LEFT JOIN UserPhone up ON u.userId = up.userId WHERE u.userId = ? GROUP BY u.userId, u.name;";
-		PreparedStatement ps = conn.prepareStatement(query);
-		ps.setLong(1, userId);
-		ResultSet rs = ps.executeQuery();
-		if (rs.next()) {
-			UserEmail userEmail;
-			UserPhone userPhone;
-			User user = new User(rs.getString("password"), rs.getString("name"), rs.getString("dateOfBirth"),
-					rs.getInt("age"), rs.getString("state"), rs.getString("city"), rs.getInt("passCheck"));
-			ArrayList<UserEmail> userEmails = new ArrayList<>();
-			ArrayList<UserPhone> userPhones = new ArrayList<>();
-			System.out.println("PrimaryCheck " + rs.getString("isPrime"));
-			String[] dbEmails = rs.getString("userEmails").split(",");
-			String[] dbIsPrimes = rs.getString("isPrime").split(",");
-			String[] dbPhones = rs.getString("userPhones").split(",");
+	public static User getUserPojo(long userId) throws ClassNotFoundException, SQLException, InstantiationException,
+			IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException,
+			SecurityException, NoSuchFieldException {
+		QueryBuilder2 qb = new QueryBuilder2();
+		qb.select().from(JojoDB.Table.USER)
+				.join(JojoDB.JoinType.LEFT_JOIN, JojoDB.Table.USEREMAIL, JojoDB.UserTab.USERID,
+						JojoDB.UserEmailTab.USERID)
+				.join(JojoDB.JoinType.LEFT_JOIN, JojoDB.Table.USERPHONE, JojoDB.UserTab.USERID,
+						JojoDB.UserPhoneTab.USERID)
+				.where(JojoDB.UserTab.USERID, JojoDB.Comparisons.EQUALS, String.valueOf(userId)).build();
 
-			for (int i = 0; i < dbEmails.length; i++) {
-				String boolValue = dbIsPrimes[i].equals("1") ? "true" : "false";
-				userEmail = new UserEmail(userId, dbEmails[i], Boolean.parseBoolean(boolValue));
-				userEmails.add(userEmail);
-			}
-
-			for (int j = 0; j < dbPhones.length; j++) {
-				userPhone = new UserPhone(userId, Long.parseLong(dbPhones[j]));
-				userPhones.add(userPhone);
-			}
-			user.setUserId(userId);
-			user.setUserEmail(userEmails);
-			user.setUserPhone(userPhones);
-			return user;
+		JojoStmt js = new JojoStmt(qb);
+		JojoResult jr = js.executeQuery();
+		if (jr.next()) {
+			return jr.getPojo();
 		}
+
+//		Connection conn = connectToDB();
+//		String query = "SELECT u.*, GROUP_CONCAT(DISTINCT ue.userEmail) AS userEmails, GROUP_CONCAT(ue.isPrime) AS isPrime, GROUP_CONCAT(DISTINCT up.userPhone) AS userPhones FROM User u LEFT JOIN UserEmail ue ON u.userId = ue.userId LEFT JOIN UserPhone up ON u.userId = up.userId WHERE u.userId = ? GROUP BY u.userId, u.name;";
+//		PreparedStatement ps = conn.prepareStatement(query);
+//		ps.setLong(1, userId);
+//		ResultSet rs = ps.executeQuery();
+//		if (rs.next()) {
+//			UserEmail userEmail;
+//			UserPhone userPhone;
+//			User user = new User(rs.getString("password"), rs.getString("name"), rs.getString("dateOfBirth"),
+//					rs.getInt("age"), rs.getString("state"), rs.getString("city"), rs.getInt("passCheck"));
+//			ArrayList<UserEmail> userEmails = new ArrayList<>();
+//			ArrayList<UserPhone> userPhones = new ArrayList<>();
+//			System.out.println("PrimaryCheck " + rs.getString("isPrime"));
+//			String[] dbEmails = rs.getString("userEmails").split(",");
+//			String[] dbIsPrimes = rs.getString("isPrime").split(",");
+//			String[] dbPhones = rs.getString("userPhones").split(",");
+//
+//			for (int i = 0; i < dbEmails.length; i++) {
+//
+//				String boolValue = dbIsPrimes[i].equals("1") ? "true" : "false";
+//				userEmail = new UserEmail(userId, dbEmails[i], Boolean.parseBoolean(boolValue));
+//				userEmails.add(userEmail);
+//			}
+//
+//			for (int j = 0; j < dbPhones.length; j++) {
+//				userPhone = new UserPhone(userId, Long.parseLong(dbPhones[j]));
+//				userPhones.add(userPhone);
+//			}
+//			user.setUserId(userId);
+//			user.setUserEmail(userEmails);
+//			user.setUserPhone(userPhones);
+//			return user;
+//		}
 		return null;
 	}
 
@@ -161,7 +184,9 @@ public class UserDao {
 		return legit;
 	}
 
-	public static User loginUser(String mailId, String password) throws ClassNotFoundException, SQLException {
+	public static User loginUser(String mailId, String password) throws ClassNotFoundException, SQLException,
+			InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException,
+			NoSuchMethodException, SecurityException, NoSuchFieldException {
 		int algoNum = 1;
 		Connection conn = connectToDB();
 		String query = "select * from User u join UserEmail ue on u.userId = ue.userId where userEmail = ?;";
