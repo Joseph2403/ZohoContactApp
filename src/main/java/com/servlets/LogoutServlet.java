@@ -8,26 +8,24 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.database.SessionHandler;
 import com.database.SessionManager;
 
 @WebServlet("/LogoutServlet")
 public class LogoutServlet extends HttpServlet {
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    public LogoutServlet() {
-        super();
-    }
+	public LogoutServlet() {
+		super();
+	}
 
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-    	String sessionId = SessionManager.getSessionIdFromCookies(request);
-		try {
-			SessionManager.deleteSessionFromDb(sessionId);
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-        SessionManager.deleteSessionFromCookies(response);
-        SessionManager.delExpiry();
-        System.out.println("EXPIRED AT (LOGOUT) = "+SessionManager.expiredAt);
-        response.sendRedirect("login.jsp");
-    }
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		String sessionId = SessionManager.getSessionIdFromCookies(request);
+		SessionHandler.deleteSessionCache(sessionId);
+		SessionHandler.deleteSessionFromDb(sessionId);
+		SessionHandler.deleteSessionFromCookies(response);
+
+		response.sendRedirect("login.jsp");
+	}
 }

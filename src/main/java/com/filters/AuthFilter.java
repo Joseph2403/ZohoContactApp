@@ -1,14 +1,12 @@
 package com.filters;
 
 import java.io.IOException;
-import java.sql.SQLException;
 
 import javax.servlet.*;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.*;
 
 import com.database.SessionHandler;
-import com.database.SessionManager;
 import com.pojo.Session;
 
 @WebFilter("/AuthFilter")
@@ -27,6 +25,7 @@ public class AuthFilter extends HttpFilter implements Filter {
 		boolean isInitialServlet = uri.endsWith("/index.jsp") || uri.endsWith("/login.jsp")
 				|| uri.endsWith("/signup.jsp") || uri.endsWith("/LoginServlet") || uri.endsWith("/SignUpServlet")
 				|| uri.endsWith("/");
+//		SessionHandler.loadActiveSessions();
 
 		if (!isValidSession && isInitialServlet) {
 			chain.doFilter(httpRequest, httpResponse);
@@ -40,11 +39,13 @@ public class AuthFilter extends HttpFilter implements Filter {
 
 		if (isValidSession && !isInitialServlet) {
 			chain.doFilter(httpRequest, httpResponse);
+			SessionHandler.updateSessionCache(sessionId);
 			return;
 		}
 
 		if (isValidSession && isInitialServlet) {
 			httpResponse.sendRedirect("userdashboard.jsp");
+			SessionHandler.updateSessionCache(sessionId);
 			return;
 		}
 

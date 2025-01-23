@@ -21,6 +21,8 @@ public class TestExecutor {
 						JojoDB.UserPhoneTab.USERID)
 				.where(JojoDB.UserTab.USERID, JojoDB.Comparisons.EQUALS, "15").build();
 		
+		
+		
 		JojoStmt js = new JojoStmt(qb);
 		JojoResult jr = js.executeQuery();
 		while (jr.next()) {

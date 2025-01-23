@@ -31,6 +31,7 @@ public class LoginServlet extends HttpServlet {
 			if (user != null) {
 				Session session = SessionHandler.getNewSession(user.getUserId());
 				SessionHandler.storeSessionIdInCookies(response, session.getSessionId());
+				SessionHandler.addToSessionCache(session);
 				response.sendRedirect("userdashboard.jsp");
 			} else {
 				out.println("<script type=\"text/javascript\">");

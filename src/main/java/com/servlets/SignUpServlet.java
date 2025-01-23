@@ -18,6 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import com.database.SessionHandler;
 import com.database.SessionManager;
 import com.database.UserDao;
 
@@ -52,10 +53,9 @@ public class SignUpServlet extends HttpServlet {
 				UserEmail userEmail = new UserEmail(userId, email, true);
 				emails.add(userEmail);
 				if (UserDao.insertUserEmail(userId, email, true) && UserDao.insertUserPhone(userId, phoneNumber)) {
-					Session session = SessionManager.getSessionFromCookies(request) != null
-							? SessionManager.getSessionFromCookies(request)
-							: SessionManager.getNewSession(userId);
-					SessionManager.storeSessionId(response, session.getSessionId());
+					Session session = SessionHandler.getNewSession(user.getUserId());
+					SessionHandler.storeSessionIdInCookies(response, session.getSessionId());
+					SessionHandler.addToSessionCache(session);
 					user.setUserId(userId);
 					user.setUserEmail(emails);
 					response.sendRedirect("userdashboard.jsp");
